@@ -318,6 +318,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       <div class="topbar">
         <div><div class="tb-title">My Agenda</div><div class="tb-sub">Conference sessions · join to build your personal schedule</div></div>
         <div style="display:flex;gap:8px;align-items:center">
+          <div id="agenda-add-btn"></div>
           <div class="vsw"><button class="vb active" onclick="setView('cards',this)">Cards</button><button class="vb" onclick="setView('timeline',this)">Timeline</button></div>
         </div>
       </div>
@@ -369,7 +370,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
 
     <!-- ATTENDEES -->
     <div class="page" id="page-attendees">
-      <div class="topbar"><div><div class="tb-title">Attendees</div><div class="tb-sub">32 participants · SteerCo members & GFSI team</div></div></div>
+      <div class="topbar"><div><div class="tb-title">Attendees</div><div class="tb-sub">32 participants · SteerCo members & GFSI team</div></div><div id="att-add-btn"></div></div>
       <div class="content">
         <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="att-filters"></div>
         <div class="att-grid" id="att-grid"></div>
@@ -773,7 +774,7 @@ async function onSignedIn(user){
   document.getElementById('sbrl').textContent=CP.role==='admin'?'Administrator':CP.role==='keyuser'?'Key User':'Member';
   if(isKU()){document.getElementById('adm-ngl').style.display='block';document.getElementById('adm-ni').style.display='flex';}
   // Load custom data from DB
-  loadCustomMeetings();loadCustomEvents();
+  loadCustomMeetings();loadCustomEvents();loadCustomSessions();
   buildAgenda();buildFeedbackSelect();buildAttendees();buildEvents();
 }
 async function doLogout(){await sb.auth.signOut();}
@@ -1276,6 +1277,9 @@ function buildBulkPreview(){
 /* ── ATTENDEES ── */
 let attFilter='All';
 function buildAttendees(){
+  const ab=document.getElementById('att-add-btn');
+  if(ab&&isKU())ab.innerHTML='<button class="btn btn-ac btn-sm" onclick="openAddAttendee()">+ Participant</button>';
+  customAttendees=[...ATTENDEES];
   const groups=[...new Set(ATTENDEES.map(a=>a.g))];
   const flt=document.getElementById('att-filters');flt.innerHTML='';
   ['All',...groups].forEach(g=>{const b=document.createElement('button');b.className='rfb'+(g===attFilter?' active':'');b.textContent=g;b.onclick=()=>{attFilter=g;document.querySelectorAll('#att-filters .rfb').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderAttendees();};flt.appendChild(b);});
@@ -1283,11 +1287,12 @@ function buildAttendees(){
 }
 function renderAttendees(){
   const grid=document.getElementById('att-grid');grid.innerHTML='';
-  const list=attFilter==='All'?ATTENDEES:ATTENDEES.filter(a=>a.g===attFilter);
+  const list=attFilter==='All'?customAttendees:customAttendees.filter(a=>a.g===attFilter);
   list.forEach((a,i)=>{
+    const realIdx=customAttendees.indexOf(a);
     const d=document.createElement('div');d.className='att-card';
     const gc={'GFSI SteerCo':'#6366f1','CGF':'#14b8a6','Consultant':'#f59e0b'}[a.g]||MCOLAV[i%MCOLAV.length];
-    d.innerHTML=`<div class="att-av" style="background:${gc}">${ini(a.n)}</div><div><div class="att-name">${a.n}</div><div class="att-org">${a.o}</div><div class="att-grp" style="color:${gc}">${a.g}</div></div>`;
+    d.innerHTML=`<div class="att-av" style="background:${gc}">${ini(a.n)}</div><div style="flex:1"><div class="att-name">${a.n}</div><div class="att-org">${a.o}</div><div class="att-grp" style="color:${gc}">${a.g}</div></div>${isKU()?`<button onclick="openEditAttendee(${realIdx})" style="background:none;border:none;color:var(--t4);cursor:pointer;font-size:13px;padding:0" title="Modifier">&#9998;</button>`:''}`;
     grid.appendChild(d);
   });
 }
@@ -1297,6 +1302,8 @@ let myReg=new Set();
 async function buildAgenda(){
   const{data}=await sb.from('registrations').select('session_id').eq('user_id',CU.id);
   if(data)data.forEach(r=>myReg.add(r.session_id));
+  const ab=document.getElementById('agenda-add-btn');
+  if(ab&&isKU())ab.innerHTML='<button class="btn btn-ac btn-sm" onclick="openAddSession()">+ Session</button>';
   const tabs=document.getElementById('dtabs');tabs.innerHTML='';
   DAYS.forEach(d=>{
     const b=document.createElement('button');b.className='dtab'+(d.k===currentDay?' active':'');
@@ -1326,7 +1333,7 @@ function renderCards(sessions,rm){
         ${s.speakers?`<div class="sc-sp">${s.speakers}</div>`:''}
         ${attendees.length?`<div class="sc-avs">${attendees.map((n,i)=>`<div class="av" style="background:${MCOLAV[i%MCOLAV.length]}22;color:${MCOLAV[i%MCOLAV.length]}">${n}</div>`).join('')}</div>`:''}
       </div>
-      <div class="sc-act">${canReg?`<button class="btn btn-sm ${isMine?'btn-gh':'btn-ac'}" onclick="toggleReg('${s.id}',${isMine})">${isMine?'✓ Joined':'+ Join'}</button>`:''}</div>`;
+      <div class="sc-act">${isKU()?`<button class="btn btn-gh btn-xs" onclick="event.stopPropagation();openEditSession('${s.id}')" style="margin-right:4px">✏</button>`:''} ${canReg?`<button class="btn btn-sm ${isMine?'btn-gh':'btn-ac'}" onclick="toggleReg('${s.id}',${isMine})">${isMine?'✓ Joined':'+ Join'}</button>`:''}</div>`;
     row.onclick=(e)=>{if(!e.target.classList.contains('btn'))openSessModal(s,attendees);};
     list.appendChild(row);
   });
@@ -1640,6 +1647,200 @@ function goTo(page,el){
 function closeMo(id){document.getElementById(id).classList.remove('open');}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
+
+
+/* ── SESSION EDITING ── */
+let customSessions=[];
+let editingSessionId=null;
+
+async function loadCustomSessions(){
+  const{data}=await sb.from('custom_sessions').select('*');
+  customSessions=data||[];
+  // Override defaults with custom
+  customSessions.forEach(cs=>{
+    const idx=SESSIONS.findIndex(s=>s.id===cs.id||(cs._override_id&&s.id===cs._override_id));
+    if(idx>=0)SESSIONS[idx]={...SESSIONS[idx],...cs,_custom:true};
+    else SESSIONS.push({...cs,_custom:true});
+  });
+}
+
+function openAddSession(){
+  editingSessionId=null;
+  document.getElementById('esm-title').textContent='Ajouter une session';
+  document.getElementById('esm-title-inp').value='';
+  document.getElementById('esm-type').value='plenary';
+  document.getElementById('esm-day').value='day1';
+  document.getElementById('esm-start').value='';
+  document.getElementById('esm-end').value='';
+  document.getElementById('esm-loc').value='';
+  document.getElementById('esm-speakers').value='';
+  document.getElementById('del-sess-btn').style.display='none';
+  document.getElementById('esm-default-warn').style.display='none';
+  document.getElementById('edit-sess-modal').classList.add('open');
+}
+
+function openEditSession(id){
+  const s=SESSIONS.find(s=>s.id===id);if(!s)return;
+  editingSessionId=id;
+  const isDefault=!s._custom;
+  document.getElementById('esm-title').textContent='Modifier la session';
+  document.getElementById('esm-default-warn').style.display=isDefault?'block':'none';
+  document.getElementById('esm-title-inp').value=s.title||'';
+  document.getElementById('esm-type').value=s.type||'plenary';
+  document.getElementById('esm-day').value=s.day||'day1';
+  document.getElementById('esm-start').value=s.start||'';
+  document.getElementById('esm-end').value=s.end||'';
+  document.getElementById('esm-loc').value=s.location||'';
+  document.getElementById('esm-speakers').value=s.speakers||'';
+  document.getElementById('del-sess-btn').style.display=s._custom?'inline-flex':'none';
+  document.getElementById('edit-sess-modal').classList.add('open');
+}
+
+async function saveSession(){
+  const obj={
+    title:document.getElementById('esm-title-inp').value,
+    type:document.getElementById('esm-type').value,
+    day:document.getElementById('esm-day').value,
+    start:document.getElementById('esm-start').value,
+    end:document.getElementById('esm-end').value,
+    location:document.getElementById('esm-loc').value,
+    speakers:document.getElementById('esm-speakers').value
+  };
+  const s=SESSIONS.find(s=>s.id===editingSessionId);
+  const isCustom=s?._custom;
+  const isDefault=editingSessionId&&!isCustom;
+  if(isCustom){
+    await sb.from('custom_sessions').update(obj).eq('id',editingSessionId);
+    const idx=SESSIONS.findIndex(s=>s.id===editingSessionId);
+    if(idx>=0)SESSIONS[idx]={...SESSIONS[idx],...obj};
+  } else if(isDefault){
+    const{data}=await sb.from('custom_sessions').insert({...obj,_override_id:editingSessionId}).select().single();
+    if(data){const idx=SESSIONS.findIndex(s=>s.id===editingSessionId);if(idx>=0)SESSIONS[idx]={...SESSIONS[idx],...data,_custom:true};}
+  } else {
+    const newId='custom-'+Date.now();
+    const{data}=await sb.from('custom_sessions').insert({...obj,id:newId}).select().single();
+    if(data)SESSIONS.push({...data,_custom:true});
+  }
+  closeMo('edit-sess-modal');toast('Session enregistrée ✓');
+  buildAgenda();buildFeedbackSelect();
+}
+
+async function deleteSession(){
+  if(!editingSessionId||!confirm('Supprimer cette session ?'))return;
+  await sb.from('custom_sessions').delete().eq('id',editingSessionId);
+  const idx=SESSIONS.findIndex(s=>s.id===editingSessionId);
+  if(idx>=0)SESSIONS.splice(idx,1);
+  closeMo('edit-sess-modal');toast('Session supprimée');
+  buildAgenda();
+}
+
+/* ── ATTENDEE EDITING ── */
+let customAttendees=[...ATTENDEES];
+let editingAttIdx=null;
+
+function openAddAttendee(){
+  editingAttIdx=null;
+  document.getElementById('eam-title').textContent='Ajouter un participant';
+  document.getElementById('eam-name').value='';
+  document.getElementById('eam-org').value='';
+  document.getElementById('eam-group').value='GFSI SteerCo';
+  document.getElementById('del-att-btn').style.display='none';
+  document.getElementById('edit-att-modal').classList.add('open');
+}
+
+function openEditAttendee(idx){
+  editingAttIdx=idx;
+  const a=customAttendees[idx];if(!a)return;
+  document.getElementById('eam-title').textContent='Modifier le participant';
+  document.getElementById('eam-name').value=a.n||'';
+  document.getElementById('eam-org').value=a.o||'';
+  document.getElementById('eam-group').value=a.g||'GFSI SteerCo';
+  document.getElementById('del-att-btn').style.display='inline-flex';
+  document.getElementById('edit-att-modal').classList.add('open');
+}
+
+function saveAttendee(){
+  const obj={n:document.getElementById('eam-name').value,o:document.getElementById('eam-org').value,g:document.getElementById('eam-group').value};
+  if(editingAttIdx!==null){
+    customAttendees[editingAttIdx]=obj;
+  } else {
+    customAttendees.push(obj);
+  }
+  closeMo('edit-att-modal');toast('Participant enregistré ✓');
+  buildAttendees();
+}
+
+function deleteAttendee(){
+  if(editingAttIdx===null||!confirm('Supprimer ce participant ?'))return;
+  customAttendees.splice(editingAttIdx,1);
+  closeMo('edit-att-modal');toast('Participant supprimé');
+  buildAttendees();
+}
+
 </script>
+
+<!-- EDIT SESSION MODAL -->
+<div class="mo" id="edit-sess-modal"><div class="md" style="width:620px"><button class="mdx" onclick="closeMo('edit-sess-modal')">✕</button>
+  <div class="md-title" id="esm-title">Modifier la session</div>
+  <div id="esm-default-warn" style="display:none;margin:10px 0;padding:9px 12px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:7px;font-size:11px;color:#fbbf24">
+    &#9888; Session par défaut — la modification créera une entrée personnalisée.
+  </div>
+  <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
+    <div class="fg"><label>Titre</label><input id="esm-title-inp" class="fi-inline" placeholder="Titre de la session"></div>
+    <div class="fgr">
+      <div class="fg"><label>Type</label>
+        <select id="esm-type" class="fi-inline">
+          <option value="plenary">Plenary</option>
+          <option value="breakout">Breakout</option>
+          <option value="workshop">Workshop</option>
+          <option value="techtalk">Tech Talk</option>
+          <option value="event">Event</option>
+          <option value="break">Break</option>
+        </select>
+      </div>
+      <div class="fg"><label>Jour</label>
+        <select id="esm-day" class="fi-inline">
+          <option value="day1">Day 1 — Mar 24</option>
+          <option value="day2">Day 2 — Mar 25</option>
+          <option value="day3">Day 3 — Mar 26</option>
+        </select>
+      </div>
+    </div>
+    <div class="fgr">
+      <div class="fg"><label>Heure début</label><input id="esm-start" class="fi-inline" type="time"></div>
+      <div class="fg"><label>Heure fin</label><input id="esm-end" class="fi-inline" type="time"></div>
+    </div>
+    <div class="fg"><label>Lieu</label><input id="esm-loc" class="fi-inline" placeholder="Plenary Hall"></div>
+    <div class="fg"><label>Intervenants</label><input id="esm-speakers" class="fi-inline" placeholder="Nom 1 · Nom 2"></div>
+    <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
+      <button class="btn btn-ac" onclick="saveSession()">&#128190; Enregistrer</button>
+      <button class="btn btn-gh" onclick="closeMo('edit-sess-modal')">Annuler</button>
+      <button class="btn btn-red" id="del-sess-btn" style="display:none;margin-left:auto" onclick="deleteSession()">&#128465; Supprimer</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- EDIT ATTENDEE MODAL -->
+<div class="mo" id="edit-att-modal"><div class="md" style="width:480px"><button class="mdx" onclick="closeMo('edit-att-modal')">✕</button>
+  <div class="md-title" id="eam-title">Modifier le participant</div>
+  <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
+    <div class="fg"><label>Nom complet</label><input id="eam-name" class="fi-inline" placeholder="Prénom Nom"></div>
+    <div class="fg"><label>Organisation</label><input id="eam-org" class="fi-inline" placeholder="Company Name"></div>
+    <div class="fg"><label>Groupe</label>
+      <select id="eam-group" class="fi-inline">
+        <option value="GFSI SteerCo">GFSI SteerCo</option>
+        <option value="CGF">CGF</option>
+        <option value="Consultant">Consultant</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-ac" onclick="saveAttendee()">&#128190; Enregistrer</button>
+      <button class="btn btn-gh" onclick="closeMo('edit-att-modal')">Annuler</button>
+      <button class="btn btn-red" id="del-att-btn" style="display:none;margin-left:auto" onclick="deleteAttendee()">&#128465; Supprimer</button>
+    </div>
+  </div>
+</div></div>
+
 </body>
 </html>
