@@ -258,6 +258,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
 /* CALENDAR DRAG */
 .cal-ev-pill[draggable="true"]:hover{filter:brightness(1.12);transform:translateX(1px);}
 
+/* WEEK VIEW EVENTS PANEL */
+.week-ev-panel{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:4px;}
+.wep-col{background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden;transition:border-color .15s;}
+.wep-head{padding:6px 9px;background:var(--s2);border-bottom:1px solid var(--bd);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);display:flex;justify-content:space-between;align-items:center;}
+.wep-body{padding:4px;display:flex;flex-direction:column;gap:3px;min-height:32px;}
+.wep-pill{padding:5px 7px;border-radius:5px;font-size:9px;font-weight:600;line-height:1.3;cursor:grab;user-select:none;transition:all .15s;position:relative;}
+.wep-pill:hover{filter:brightness(1.18);}
+.wep-pill.dragging{opacity:.35;cursor:grabbing;}
+.wcc.drag-over{background:rgba(99,102,241,.12)!important;outline:1.5px dashed rgba(99,102,241,.55);}
+.wcp-edit-btn{background:none;border:none;cursor:pointer;padding:0 2px;font-size:9px;opacity:.55;transition:opacity .15s;line-height:1;}
+.wcp-edit-btn:hover{opacity:1;}
+.week-ev-section{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:18px;}
+.week-ev-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.week-ev-section-title::after{content:'';flex:1;height:1px;background:var(--bd);}
+
 /* WEEK VIEW HEADER */
 .week-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
 .week-label{font-size:15px;font-weight:700;letter-spacing:-.3px;}
@@ -341,6 +356,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
     <div class="page" id="page-week">
       <div class="topbar"><div><div class="tb-title">Full Week View</div><div class="tb-sub">All days · all sessions · complete overview</div></div></div>
       <div class="content">
+        <div id="week-events-section"></div>
         <div id="week-member-legend" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;"></div>
         <div class="week-cal"><div class="wc-inner" id="wc-inner"></div></div>
       </div>
@@ -1419,8 +1435,6 @@ async function buildWeekView(){
   const allSids=SESSIONS.map(s=>s.id);
   const{data:regs}=await sb.from('registrations').select('session_id,user_id').in('session_id',allSids);
 
-  // Merge pre-conference events into a session-like structure keyed by day
-  // dayKey map: pre1=Mar 22, pre2=Mar 23, day1=Mar 24, day2=Mar 25, day3=Mar 26
   const dayKeyMap={'22/03':'pre1','23/03':'pre2','24/03':'day1','25/03':'day2','26/03':'day3'};
   function evDayKey(ev){
     const d=ev.date||'';
@@ -1443,6 +1457,54 @@ async function buildWeekView(){
     if(idx>=0)allPreEvs[idx]={...allPreEvs[idx],...ce}; else allPreEvs.push(ce);
   });
 
+  // ── EVENTS & MEETINGS PANEL (au-dessus du calendrier) ──
+  const evSec=document.getElementById('week-events-section');
+  if(evSec){
+    const dayMap={'pre1':'Sunday Mar 22','pre2':'Monday Mar 23','day1':'Tuesday Mar 24','day2':'Wednesday Mar 25','day3':'Thursday Mar 26'};
+    let panelHtml=`<div class="week-ev-section">
+      <div class="week-ev-section-title">📅 Events &amp; Meetings
+        <span style="font-size:9px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0">Glisser un événement vers une cellule du calendrier pour le déplacer</span>
+        ${isKU()?`<button class="btn btn-ac btn-xs" onclick="openAddEvent()">+ Ajouter</button>`:''}
+      </div>
+      <div class="week-ev-panel">`;
+    ALL_DAYS.forEach(d=>{
+      const dayEvts=allPreEvs.filter(e=>evDayKey(e)===d.k);
+      panelHtml+=`<div class="wep-col">
+        <div class="wep-head">${d.l}
+          ${isKU()?`<button onclick="openAddEventOnDay('${dayMap[d.k]}')" style="background:none;border:none;color:var(--t4);cursor:pointer;font-size:16px;padding:0;line-height:1" title="Ajouter">+</button>`:''}
+        </div>
+        <div class="wep-body">`;
+      if(dayEvts.length){
+        dayEvts.forEach(e=>{
+          const isMeet=(e.cat||'team')==='meeting';
+          const col=isMeet?'#6366f1':'#14b8a6';
+          const rgb=isMeet?'99,102,241':'20,184,166';
+          const time=(e.date.split('·')[1]||'').trim();
+          panelHtml+=`<div class="wep-pill" draggable="true" data-evid="${e.id}"
+            style="background:rgba(${rgb},.1);color:${col};border-left:2px solid ${col};"
+            ondragstart="wepDragStart(event,'${e.id}')">
+            <div style="font-size:9px;font-weight:700;line-height:1.3">${e.title.length>32?e.title.slice(0,30)+'…':e.title}</div>
+            ${time?`<div style="font-size:8px;opacity:.65;margin-top:1px">${time}</div>`:''}
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px">
+              <span style="font-size:8px;opacity:.5">${isMeet?'Meeting':'Team Event'}</span>
+              ${isKU()?`<button class="wcp-edit-btn" onclick="event.stopPropagation();openEditEvent('${e.id}')" title="Modifier">✏</button>`:''}
+            </div>
+          </div>`;
+        });
+      } else {
+        panelHtml+=`<div style="font-size:9px;color:var(--t4);padding:5px 4px;font-style:italic;text-align:center">—</div>`;
+      }
+      panelHtml+=`</div></div>`;
+    });
+    panelHtml+=`</div>
+      <div style="display:flex;gap:14px;margin-top:8px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t2)"><div style="width:9px;height:9px;border-radius:2px;background:#6366f1"></div>Meetings</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t2)"><div style="width:9px;height:9px;border-radius:2px;background:#14b8a6"></div>Team Events</div>
+      </div>
+    </div>`;
+    evSec.innerHTML=panelHtml;
+  }
+
   // Member legend
   const ml=document.getElementById('week-member-legend');ml.innerHTML='<span style="font-size:10px;color:var(--t3);margin-right:4px">Members:</span>';
   profiles.forEach((p,i)=>{ml.innerHTML+=`<div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t2)"><div style="width:16px;height:16px;border-radius:50%;background:${MCOLAV[i%MCOLAV.length]};display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff">${ini(p.name||p.email)}</div>${(p.name||p.email).split(' ')[0]}</div>`;});
@@ -1453,7 +1515,7 @@ async function buildWeekView(){
   head.innerHTML='<div class="wch" style="max-width:70px">Heure</div>'+ALL_DAYS.map(d=>`<div class="wch">${d.l}</div>`).join('');
   wrap.appendChild(head);
 
-  // Collect all time slots: conference sessions + pre-conf events
+  // Collect all time slots: conference sessions + all events
   const sessionSlots=SESSIONS.filter(s=>s.type!=='break').map(s=>s.start);
   const preEvSlots=allPreEvs.map(e=>evStartTime(e)).filter(t=>t!=='00:00');
   const allSlots=[...new Set([...sessionSlots,...preEvSlots])].sort((a,b)=>{
@@ -1467,46 +1529,86 @@ async function buildWeekView(){
     row.innerHTML=`<div class="wct">${time}</div>`;
     ALL_DAYS.forEach(d=>{
       const cell=document.createElement('div');cell.className='wcc';
+      // Drop zone on each cell
+      cell.ondragover=(e)=>{e.preventDefault();e.dataTransfer.dropEffect='move';cell.classList.add('drag-over');};
+      cell.ondragleave=()=>cell.classList.remove('drag-over');
+      cell.ondrop=(e)=>wcDrop(e,cell,d);
 
       // Conference sessions for this day+time
       const daySessions=SESSIONS.filter(s=>s.day===d.k&&s.start===time&&s.type!=='break');
       daySessions.forEach(s=>{
         const col=MCOL[s.type]||'#6366f1';
         const pill=document.createElement('div');pill.className='wcp';
-        pill.style.cssText=`background:${col}20;color:${col};border-left:2px solid ${col};`;
-        pill.innerHTML=`${s.title.length>40?s.title.slice(0,37)+'…':s.title}`;
+        pill.style.cssText=`background:${col}20;color:${col};border-left:2px solid ${col};position:relative;`;
         const attending=profiles.filter(p=>regs?.some(r=>r.user_id===p.id&&r.session_id===s.id));
+        const editBtn=isKU()?`<button class="wcp-edit-btn" onclick="event.stopPropagation();openEditSession('${s.id}')" title="Modifier la session">✏</button>`:'';
+        pill.innerHTML=`<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:3px">
+          <span style="flex:1">${s.title.length>38?s.title.slice(0,35)+'…':s.title}</span>${editBtn}</div>`;
         if(attending.length){
           const dots=document.createElement('div');dots.style.cssText='display:flex;gap:2px;margin-top:3px;flex-wrap:wrap;';
           attending.forEach(p=>{const di=profiles.indexOf(p);dots.innerHTML+=`<div style="width:10px;height:10px;border-radius:50%;background:${MCOLAV[di%MCOLAV.length]};font-size:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">${ini(p.name||p.email)[0]}</div>`;});
           pill.appendChild(dots);
         }
-        pill.onclick=()=>openSessModal(s,attending.map(p=>p.name||p.email));
+        pill.onclick=(ev)=>{if(ev.target.classList.contains('wcp-edit-btn'))return;openSessModal(s,attending.map(p=>p.name||p.email));};
         cell.appendChild(pill);
       });
 
-      // Pre-conference events for this day+time (22 & 23 mars)
-      if(d.k==='pre1'||d.k==='pre2'){
-        const dayEvts=allPreEvs.filter(e=>evDayKey(e)===d.k&&evStartTime(e)===time);
-        dayEvts.forEach(e=>{
-          const isMeet=(e.cat||'team')==='meeting';
-          const col=isMeet?'#6366f1':'#14b8a6';
-          const pill=document.createElement('div');pill.className='wcp';
-          pill.style.cssText=`background:${col}20;color:${col};border-left:2px solid ${col};margin-bottom:2px;`;
-          const timeRange=(e.date.split('·')[1]||'').trim();
-          pill.innerHTML=`<div style="font-size:9px;font-weight:700">${e.title.length>38?e.title.slice(0,36)+'…':e.title}</div><div style="font-size:8px;opacity:.7;margin-top:1px">${timeRange||''} · ${isMeet?'Meeting':'Team Event'}</div>`;
-          if(isKU())pill.innerHTML+=`<button onclick="event.stopPropagation();openEditEvent('${e.id}')" style="background:none;border:none;color:${col};cursor:pointer;font-size:9px;padding:0;margin-top:2px;opacity:.7">✏ Modifier</button>`;
-          pill.onclick=(ev)=>{if(!ev.target.tagName==='BUTTON'){}};
-          cell.appendChild(pill);
-        });
-      }
+      // Events for ALL days (not just pre1/pre2)
+      const dayEvts=allPreEvs.filter(e=>evDayKey(e)===d.k&&evStartTime(e)===time);
+      dayEvts.forEach(e=>{
+        const isMeet=(e.cat||'team')==='meeting';
+        const col=isMeet?'#6366f1':'#14b8a6';
+        const pill=document.createElement('div');pill.className='wcp';
+        pill.style.cssText=`background:${col}20;color:${col};border-left:2px solid ${col};margin-bottom:2px;`;
+        const timeRange=(e.date.split('·')[1]||'').trim();
+        const editBtn=isKU()?`<button class="wcp-edit-btn" onclick="event.stopPropagation();openEditEvent('${e.id}')" title="Modifier">✏</button>`:'';
+        pill.innerHTML=`<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:3px">
+          <div style="flex:1"><div style="font-size:9px;font-weight:700">${e.title.length>36?e.title.slice(0,34)+'…':e.title}</div><div style="font-size:8px;opacity:.65;margin-top:1px">${timeRange||''} · ${isMeet?'Meeting':'Team Event'}</div></div>${editBtn}</div>`;
+        pill.onclick=(ev)=>{if(ev.target.classList.contains('wcp-edit-btn'))return;};
+        cell.appendChild(pill);
+      });
 
       row.appendChild(cell);
     });
-    // Only add row if it has at least one event somewhere
     const hasContent=row.querySelectorAll('.wcp').length>0;
     if(hasContent)wrap.appendChild(row);
   });
+}
+
+/* ── WEEK VIEW DRAG ── */
+let wepDragEvId=null;
+function wepDragStart(e,evid){
+  wepDragEvId=evid;
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/evid',evid);
+  e.currentTarget.classList.add('dragging');
+}
+const DAY_VAL_MAP={pre1:'Sunday Mar 22',pre2:'Monday Mar 23',day1:'Tuesday Mar 24',day2:'Wednesday Mar 25',day3:'Thursday Mar 26'};
+async function wcDrop(e,cell,dayObj){
+  e.preventDefault();cell.classList.remove('drag-over');
+  const evid=e.dataTransfer.getData('text/evid')||wepDragEvId;
+  wepDragEvId=null;
+  document.querySelectorAll('.wep-pill.dragging').forEach(p=>p.classList.remove('dragging'));
+  if(!evid)return;
+  const dayV=DAY_VAL_MAP[dayObj.k]||'';
+  const allEvs=[...DEFAULT_EVENTS,...(events||[]).filter(ev=>ev._custom)];
+  const ev=allEvs.find(ev=>ev.id===evid);if(!ev)return;
+  const timePart=ev.date.includes('·')?ev.date.split('·').slice(1).join('·'):'';
+  const newDate=dayV+(timePart?' ·'+timePart:'');
+  if(newDate===ev.date){toast('Déjà sur ce jour');return;}
+  const isCustom=(events||[]).find(ev2=>ev2.id===evid&&ev2._custom);
+  if(isCustom){
+    await sb.from('custom_events').update({date:newDate}).eq('id',evid);
+    const idx=(events||[]).findIndex(ev2=>ev2.id===evid);
+    if(idx>=0)events[idx].date=newDate;
+  } else {
+    const payload={...ev,date:newDate,_override_id:evid};
+    delete payload.id;
+    const{data}=await sb.from('custom_events').insert(payload).select().single();
+    if(data){const newEv={...data,_custom:true,assignedTo:ev.assignedTo||[]};events=events||[];const idx=events.findIndex(ev2=>ev2.id===evid);if(idx>=0)events[idx]=newEv;else events.push(newEv);}
+  }
+  toast('✓ Déplacé vers '+dayV.split(' ').slice(0,2).join(' '));
+  buildWeekView();buildPreConferenceCalendar();renderEvGrid();
 }
 
 /* ── FEEDBACK ── */
