@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>GFSI Hub 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,6 +11,8 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-size:13px;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased;}
 ::-webkit-scrollbar{width:3px;height:3px;}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:4px;}
+/* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
+@media(max-width:768px){input,select,textarea{font-size:16px!important;}}
 #ls{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);position:relative;overflow:hidden;}
 #ls::before{content:'';position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(99,102,241,.1) 0%,transparent 65%);top:-200px;right:-100px;pointer-events:none;}
 .lc{background:var(--s1);border:1px solid var(--bd2);border-radius:20px;padding:44px 40px;width:390px;position:relative;z-index:1;box-shadow:0 40px 80px rgba(0,0,0,.6);}
@@ -877,11 +879,28 @@ function evStartTime(ev){return(ev.date.split('·')[1]||'').trim().split('–')[
    AUTH
 ═══════════════════════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded',()=>{
-  sb=window.supabase.createClient(SB_URL,SB_KEY);
-  sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});
+  // Mobile Safari private mode blocks localStorage — use sessionStorage as fallback
+  let storage;
+  try{localStorage.setItem('_test','1');localStorage.removeItem('_test');storage=localStorage;}
+  catch(e){storage=sessionStorage;}
+
+  sb=window.supabase.createClient(SB_URL,SB_KEY,{
+    auth:{storage,storageKey:'gfsi-auth',autoRefreshToken:true,persistSession:true,detectSessionInUrl:false}
+  });
+
+  // Guard against double-call on mobile
+  let signingIn=false;
+
+  sb.auth.getSession().then(({data:{session}})=>{
+    if(session&&!CU&&!signingIn){signingIn=true;onSignedIn(session.user);}
+  });
   sb.auth.onAuthStateChange((ev,session)=>{
-    if(ev==='SIGNED_IN'&&session&&!CU)onSignedIn(session.user);
-    if(ev==='SIGNED_OUT'){CU=null;document.getElementById('ls').style.display='flex';document.getElementById('app').style.display='none';}
+    if(ev==='SIGNED_IN'&&session&&!CU&&!signingIn){signingIn=true;onSignedIn(session.user);}
+    if(ev==='SIGNED_OUT'){
+      CU=null;CP=null;signingIn=false;
+      document.getElementById('ls').style.display='flex';
+      document.getElementById('app').style.display='none';
+    }
   });
 });
 async function doLogin(){
@@ -896,25 +915,36 @@ async function doLogin(){
 async function onSignedIn(user){
   if(CU)return;
   CU=user;
-  const{data}=await sb.from('profiles').select('*').eq('id',user.id).single();
-  CP=data||{name:user.email.split('@')[0],role:'member'};
-  if(CP.role==='disabled'){toast('Account disabled — contact your administrator','error');await sb.auth.signOut();return;}
-  // Load permissions first, then data
-  await loadPermissions();
-  await loadAllData();
-  // Show app
-  document.getElementById('ls').style.display='none';
-  document.getElementById('app').style.display='block';
-  document.getElementById('bottom-nav').style.display='block';
-  document.getElementById('sbav').textContent=ini(CP.name||user.email);
-  document.getElementById('sbun').textContent=CP.name||user.email;
-  const roleLabels={admin:'Administrator',keyuser:'Key User',member:'Member'};
-  document.getElementById('sbrl').textContent=roleLabels[CP.role]||CP.role;
-  buildNav();
-  buildAgenda();
-  buildFeedbackSelect();
-  buildAttendees();
-  buildEvents();
+  try{
+    const{data,error}=await sb.from('profiles').select('*').eq('id',user.id).single();
+    if(error&&error.code!=='PGRST116')console.warn('Profile load error:',error.message);
+    CP=data||{name:user.email.split('@')[0],role:'member'};
+    if(CP.role==='disabled'){
+      toast('Account disabled — contact your administrator','error');
+      await sb.auth.signOut();
+      CU=null;CP=null;
+      return;
+    }
+    await loadPermissions();
+    await loadAllData();
+    document.getElementById('ls').style.display='none';
+    document.getElementById('app').style.display='block';
+    document.getElementById('bottom-nav').style.display='block';
+    document.getElementById('sbav').textContent=ini(CP.name||user.email);
+    document.getElementById('sbun').textContent=CP.name||user.email;
+    const roleLabels={admin:'Administrator',keyuser:'Key User',member:'Member'};
+    document.getElementById('sbrl').textContent=roleLabels[CP.role]||CP.role;
+    buildNav();
+    buildAgenda();
+    buildFeedbackSelect();
+    buildAttendees();
+    buildEvents();
+  }catch(e){
+    console.error('onSignedIn error:',e);
+    toast('Erreur de chargement — réessayez','error');
+    CU=null;CP=null;
+    await sb.auth.signOut();
+  }
 }
 async function doLogout(){await sb.auth.signOut();}
 
