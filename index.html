@@ -941,7 +941,7 @@ async function onSignedIn(user){
   const btn=document.querySelector('#ls .bs');
   try{
     err.textContent='Chargement du profil…';err.style.color='var(--t3)';
-    const{data,error}=await sb.from('profiles').select('*').eq('id',user.id).single();
+    const{data}=await sb.from('profiles').select('*').eq('id',user.id).single().catch(()=>({data:null}));
     CP=data||{name:user.email.split('@')[0],role:'member'};
     if(CP.role==='disabled'){
       err.textContent='Compte désactivé — contactez votre administrateur.';
@@ -949,31 +949,31 @@ async function onSignedIn(user){
       if(btn){btn.disabled=false;btn.textContent='Sign In →';}
       await sb.auth.signOut();CU=null;CP=null;signingIn=false;return;
     }
-    err.textContent='Chargement des permissions…';
+    err.textContent='Chargement…';
     await loadPermissions();
-    err.textContent='Chargement des données…';
     await loadAllData();
-    // Show app
-    err.textContent='';
-    if(btn){btn.disabled=false;btn.textContent='Sign In →';}
-    document.getElementById('ls').style.display='none';
-    document.getElementById('app').style.display='block';
-    document.getElementById('bottom-nav').style.display='block';
-    document.getElementById('sbav').textContent=ini(CP.name||user.email);
-    document.getElementById('sbun').textContent=CP.name||user.email;
-    const roleLabels={admin:'Administrator',keyuser:'Key User',member:'Member'};
-    document.getElementById('sbrl').textContent=roleLabels[CP.role]||CP.role;
-    buildNav();
-    buildAgenda();
-    buildFeedbackSelect();
-    buildAttendees();
-    buildEvents();
   }catch(e){
-    err.textContent='Erreur: '+e.message;
+    err.textContent='Erreur de connexion: '+e.message;
     err.style.color='var(--re)';
     if(btn){btn.disabled=false;btn.textContent='Sign In →';}
     CU=null;CP=null;signingIn=false;
+    return;
   }
+  // Data loaded — show app (UI errors won't block login)
+  err.textContent='';
+  if(btn){btn.disabled=false;btn.textContent='Sign In →';}
+  document.getElementById('ls').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('bottom-nav').style.display='block';
+  document.getElementById('sbav').textContent=ini(CP.name||user.email);
+  document.getElementById('sbun').textContent=CP.name||user.email;
+  const roleLabels={admin:'Administrator',keyuser:'Key User',member:'Member'};
+  document.getElementById('sbrl').textContent=roleLabels[CP.role]||CP.role;
+  try{buildNav();}catch(e){console.warn('buildNav error:',e);}
+  try{buildAgenda();}catch(e){console.warn('buildAgenda error:',e);}
+  try{buildFeedbackSelect();}catch(e){console.warn('buildFeedbackSelect error:',e);}
+  try{buildAttendees();}catch(e){console.warn('buildAttendees error:',e);}
+  try{buildEvents();}catch(e){console.warn('buildEvents error:',e);}
 }
 async function doLogout(){await sb.auth.signOut();}
 
@@ -981,48 +981,58 @@ async function doLogout(){await sb.auth.signOut();}
    DATA LOADING — single clean load on sign-in
 ═══════════════════════════════════════════════════════ */
 async function loadAllData(){
-  await Promise.all([loadSessions(),loadEvents(),loadMeetings(),loadAttendees()]);
+  await Promise.allSettled([loadSessions(),loadEvents(),loadMeetings(),loadAttendees()]);
 }
 async function loadSessions(){
-  // Load custom sessions from DB, merge over defaults
   SESSIONS=[...DEFAULT_SESSIONS];
-  const{data}=await sb.from('custom_sessions').select('*');
-  (data||[]).forEach(cs=>{
-    cs._custom=true;
-    const key=cs._override_id||cs.id;
-    const idx=SESSIONS.findIndex(s=>s.id===key);
-    if(cs._hidden){if(idx>=0)SESSIONS.splice(idx,1);return;}
-    if(idx>=0)SESSIONS[idx]={...SESSIONS[idx],...cs};
-    else SESSIONS.push(cs);
-  });
+  try{
+    const{data,error}=await sb.from('custom_sessions').select('*');
+    if(error)return; // table may not exist yet, use defaults
+    (data||[]).forEach(cs=>{
+      cs._custom=true;
+      const key=cs._override_id||cs.id;
+      const idx=SESSIONS.findIndex(s=>s.id===key);
+      if(cs._hidden){if(idx>=0)SESSIONS.splice(idx,1);return;}
+      if(idx>=0)SESSIONS[idx]={...SESSIONS[idx],...cs};
+      else SESSIONS.push(cs);
+    });
+  }catch(e){/* use defaults */}
 }
 async function loadEvents(){
   events=[...DEFAULT_EVENTS];
-  const{data}=await sb.from('custom_events').select('*');
-  (data||[]).forEach(ce=>{
-    ce._custom=true;
-    const key=ce._override_id||ce.id;
-    const idx=events.findIndex(e=>e.id===key);
-    if(ce._hidden){if(idx>=0)events.splice(idx,1);return;}
-    if(idx>=0)events[idx]={...events[idx],...ce};
-    else events.push(ce);
-  });
+  try{
+    const{data,error}=await sb.from('custom_events').select('*');
+    if(error)return;
+    (data||[]).forEach(ce=>{
+      ce._custom=true;
+      const key=ce._override_id||ce.id;
+      const idx=events.findIndex(e=>e.id===key);
+      if(ce._hidden){if(idx>=0)events.splice(idx,1);return;}
+      if(idx>=0)events[idx]={...events[idx],...ce};
+      else events.push(ce);
+    });
+  }catch(e){/* use defaults */}
 }
 async function loadMeetings(){
   meetings=[...DEFAULT_MEETINGS];
-  const{data}=await sb.from('custom_meetings').select('*').order('date_order').catch(()=>({data:null}));
-  (data||[]).forEach(cm=>{
-    cm._custom=true;
-    const idx=meetings.findIndex(m=>m.id===cm.id);
-    if(cm._hidden){if(idx>=0)meetings.splice(idx,1);return;}
-    if(idx>=0)meetings[idx]={...meetings[idx],...cm};
-    else meetings.push(cm);
-  });
+  try{
+    const{data,error}=await sb.from('custom_meetings').select('*').order('date_order');
+    if(error)return;
+    (data||[]).forEach(cm=>{
+      cm._custom=true;
+      const idx=meetings.findIndex(m=>m.id===cm.id);
+      if(cm._hidden){if(idx>=0)meetings.splice(idx,1);return;}
+      if(idx>=0)meetings[idx]={...meetings[idx],...cm};
+      else meetings.push(cm);
+    });
+  }catch(e){/* use defaults */}
 }
 async function loadAttendees(){
-  // Try to load from DB; fallback to defaults
-  const{data}=await sb.from('attendees').select('*').order('name').catch(()=>({data:null}));
-  customAttendees=data&&data.length?data.map(r=>({n:r.name,o:r.org,g:r.group,id:r.id,_db:true})):[...DEFAULT_ATTENDEES];
+  try{
+    const{data,error}=await sb.from('attendees').select('*').order('name');
+    if(!error&&data&&data.length)customAttendees=data.map(r=>({n:r.name,o:r.org,g:r.group,id:r.id,_db:true}));
+    else customAttendees=[...DEFAULT_ATTENDEES];
+  }catch(e){customAttendees=[...DEFAULT_ATTENDEES];}
 }
 
 /* ═══════════════════════════════════════════════════════
