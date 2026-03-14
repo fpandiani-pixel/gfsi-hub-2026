@@ -302,7 +302,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
 
 <!-- LOGIN -->
 <div id="ls">
-  <div class="lc">
+  <!-- Sign In view -->
+  <div class="lc" id="lc-signin">
     <div class="ll"><div class="lm">GF</div><div><div class="lt">GFSI Hub 2026</div><div class="ls2">Vancouver · March 22–26</div></div></div>
     <div class="lh">Welcome back</div>
     <div class="lsub">Sign in to access the conference hub</div>
@@ -310,7 +311,22 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
     <label class="fl">PASSWORD</label><input class="fi" id="lp" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="bs" onclick="doLogin()">Sign In →</button>
     <div class="le" id="lerr"></div>
+    <div style="text-align:center;margin-top:12px">
+      <button onclick="showForgot()" style="background:none;border:none;color:var(--t3);font-family:'Inter',sans-serif;font-size:11px;cursor:pointer;text-decoration:underline">Forgot password?</button>
+    </div>
     <div class="lhint">GFSI team accounts only · contact your administrator</div>
+  </div>
+  <!-- Forgot Password view -->
+  <div class="lc" id="lc-forgot" style="display:none">
+    <div class="ll"><div class="lm">GF</div><div><div class="lt">GFSI Hub 2026</div><div class="ls2">Vancouver · March 22–26</div></div></div>
+    <div class="lh">Reset password</div>
+    <div class="lsub">Enter your email — we'll send you a reset link</div>
+    <label class="fl">EMAIL</label><input class="fi" id="reset-email" type="email" placeholder="you@cgf.com" onkeydown="if(event.key==='Enter')doResetPassword()">
+    <button class="bs" onclick="doResetPassword()">Send Reset Link →</button>
+    <div class="le" id="reset-err"></div>
+    <div style="text-align:center;margin-top:12px">
+      <button onclick="showSignin()" style="background:none;border:none;color:var(--t3);font-family:'Inter',sans-serif;font-size:11px;cursor:pointer;text-decoration:underline">← Back to sign in</button>
+    </div>
   </div>
 </div>
 
@@ -322,7 +338,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
     <nav class="sbnav" id="sbnav">
       <!-- Dynamically built by buildNav() based on permissions -->
     </nav>
-    <div class="sbf"><button class="bso" onclick="doLogout()">Sign out</button></div>
+    <div class="sbf">
+      <button class="bso" style="margin-bottom:6px" onclick="openChangePassword()">🔑 Change password</button>
+      <button class="bso" onclick="doLogout()">Sign out</button>
+    </div>
   </div>
 
   <div class="main">
@@ -2067,10 +2086,69 @@ function exportCSV(table){
 /* ═══════════════════════════════════════════════════════
    MOBILE NAV
 ═══════════════════════════════════════════════════════ */
+function showForgot(){
+  document.getElementById('lc-signin').style.display='none';
+  document.getElementById('lc-forgot').style.display='block';
+  document.getElementById('reset-err').textContent='';
+  document.getElementById('reset-email').value=document.getElementById('le').value||'';
+}
+function showSignin(){
+  document.getElementById('lc-forgot').style.display='none';
+  document.getElementById('lc-signin').style.display='block';
+}
+async function doResetPassword(){
+  const email=document.getElementById('reset-email').value.trim();
+  const err=document.getElementById('reset-err');
+  const btn=document.querySelector('#lc-forgot .bs');
+  err.textContent='';err.style.color='var(--re)';
+  if(!email){err.textContent='Please enter your email.';return;}
+  btn.disabled=true;btn.textContent='Sending…';
+  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.href});
+  btn.disabled=false;btn.textContent='Send Reset Link →';
+  if(error){err.textContent='Error: '+error.message;return;}
+  err.style.color='#4ade80';
+  err.textContent='✓ Reset link sent — check your inbox.';
+}
+function openChangePassword(){
+  document.getElementById('pwd-new').value='';
+  document.getElementById('pwd-confirm').value='';
+  document.getElementById('pwd-err').textContent='';
+  document.getElementById('change-pwd-modal').classList.add('open');
+}
+async function doChangePassword(){
+  const np=document.getElementById('pwd-new').value;
+  const cp=document.getElementById('pwd-confirm').value;
+  const err=document.getElementById('pwd-err');
+  err.textContent='';
+  if(!np||np.length<8){err.textContent='Password must be at least 8 characters.';return;}
+  if(np!==cp){err.textContent='Passwords do not match.';return;}
+  const btn=document.querySelector('#change-pwd-modal .btn-ac');
+  btn.disabled=true;btn.textContent='Updating…';
+  const{error}=await sb.auth.updateUser({password:np});
+  btn.disabled=false;btn.textContent='💾 Update Password';
+  if(error){err.textContent='Error: '+error.message;return;}
+  closeMo('change-pwd-modal');
+  toast('Password updated ✓');
+}
+
 function toggleSidebar(){const sb2=document.querySelector('.sidebar');const ov=document.getElementById('mob-overlay');sb2.classList.toggle('open');ov.classList.toggle('show');}
 function closeSidebar(){document.querySelector('.sidebar').classList.remove('open');document.getElementById('mob-overlay').classList.remove('show');}
 function setBN(id){document.querySelectorAll('.bn').forEach(b=>b.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');}
 
 </script>
+<div class="mo" id="change-pwd-modal"><div class="md" style="width:420px"><button class="mdx" onclick="closeMo('change-pwd-modal')">✕</button>
+  <div class="md-title">Change Password</div>
+  <div class="md-sub">Choose a new password for your account</div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+    <div class="fg"><label>New Password</label><input id="pwd-new" type="password" class="fi-inline" placeholder="Min. 8 characters" onkeydown="if(event.key==='Enter')doChangePassword()"></div>
+    <div class="fg"><label>Confirm Password</label><input id="pwd-confirm" type="password" class="fi-inline" placeholder="Repeat new password" onkeydown="if(event.key==='Enter')doChangePassword()"></div>
+    <div id="pwd-err" style="font-size:11px;color:var(--re);min-height:16px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ac" onclick="doChangePassword()">💾 Update Password</button>
+      <button class="btn btn-gh" onclick="closeMo('change-pwd-modal')">Cancel</button>
+    </div>
+  </div>
+</div></div>
+
 </body>
 </html>
