@@ -941,8 +941,9 @@ async function onSignedIn(user){
   const btn=document.querySelector('#ls .bs');
   try{
     err.textContent='Chargement du profil…';err.style.color='var(--t3)';
-    const{data}=await sb.from('profiles').select('*').eq('id',user.id).single().catch(()=>({data:null}));
-    CP=data||{name:user.email.split('@')[0],role:'member'};
+    let profileData=null;
+    try{const{data}=await sb.from('profiles').select('*').eq('id',user.id).single();profileData=data;}catch(e){}
+    CP=profileData||{name:user.email.split('@')[0],role:'member'};
     if(CP.role==='disabled'){
       err.textContent='Compte désactivé — contactez votre administrateur.';
       err.style.color='var(--re)';
