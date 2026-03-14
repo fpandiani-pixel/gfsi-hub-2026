@@ -48,6 +48,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
 .ni.active{background:rgba(99,102,241,.15);color:var(--ac2);}
 .ni-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0;}
 .sbf{padding:10px 8px;border-top:1px solid var(--bd);}
+@media(max-width:768px){.sbf{padding-bottom:calc(10px + 64px + env(safe-area-inset-bottom));}}
 .bso{width:100%;padding:7px;background:transparent;border:1px solid var(--bd2);border-radius:7px;color:var(--t3);font-family:'Inter',sans-serif;font-size:10px;cursor:pointer;transition:all .2s;}
 .bso:hover{border-color:var(--re);color:var(--re);}
 .main{margin-left:var(--nav);min-height:100vh;}
