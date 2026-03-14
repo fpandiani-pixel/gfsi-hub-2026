@@ -339,10 +339,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
     <nav class="sbnav" id="sbnav">
       <!-- Dynamically built by buildNav() based on permissions -->
     </nav>
-    <div class="sbf">
-      <button class="bso" style="margin-bottom:6px" onclick="openChangePassword()">🔑 Change password</button>
-      <button class="bso" onclick="doLogout()">Sign out</button>
-    </div>
+    <div class="sbf" style="padding:8px;border-top:1px solid var(--bd)"></div>
   </div>
 
   <div class="main">
@@ -1071,6 +1068,19 @@ function buildNav(){
       el.onclick=()=>goTo(p.key,el);
       nav.appendChild(el);
     });
+    // After the Conference group, insert account actions
+    if(group==='Conference'){
+      const sep=document.createElement('div');sep.className='ngl';sep.textContent='Account';nav.appendChild(sep);
+      const chpwd=document.createElement('div');chpwd.className='ni';
+      chpwd.innerHTML=`<span class="ni-icon">🔑</span>Change password`;
+      chpwd.onclick=openChangePassword;nav.appendChild(chpwd);
+      const lo=document.createElement('div');lo.className='ni';
+      lo.style.color='var(--re)';
+      lo.innerHTML=`<span class="ni-icon">→</span>Sign out`;
+      lo.onmouseenter=()=>lo.style.background='rgba(239,68,68,.08)';
+      lo.onmouseleave=()=>lo.style.background='';
+      lo.onclick=doLogout;nav.appendChild(lo);
+    }
   });
 }
 
