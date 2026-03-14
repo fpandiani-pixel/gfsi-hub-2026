@@ -1034,20 +1034,29 @@ function setEvCat(cat,btn){
 }
 async function renderEvGrid(){
   const grid=document.getElementById('ev-grid');grid.innerHTML='';
-  const{data:msgs}=await sb.from('event_messages').select('*');
+  // Fetch all data in parallel — single round-trip
+  const[{data:msgs},{data:allRsvps}]=await Promise.all([
+    sb.from('event_messages').select('*'),
+    sb.from('event_rsvps').select('*,profiles(name,email)')
+  ]);
   const mm={};if(msgs)msgs.forEach(m=>mm[m.event_id]=m);
-  // Merge defaults + custom overrides — custom wins
+  // Group RSVPs by event
+  const rsvpMap={};
+  (allRsvps||[]).forEach(r=>{
+    if(!rsvpMap[r.event_id])rsvpMap[r.event_id]=[];
+    rsvpMap[r.event_id].push(r);
+  });
+  // Merge defaults + custom overrides
   const merged=[...DEFAULT_EVENTS];
   (events||[]).filter(e=>e._custom).forEach(ce=>{
     const idx=merged.findIndex(d=>d.id===ce.id||(ce._override_id&&d.id===ce._override_id));
     if(idx>=0)merged[idx]={...merged[idx],...ce}; else merged.push(ce);
   });
-  // 'team' = social/dinners only, 'meeting' = internal meetings, 'all' = everything
   const filtered=evCatFilter==='all'?merged:merged.filter(e=>(e.cat||'team')===evCatFilter);
   for(const ev of filtered){
     const msg=mm[ev.id];
-    const{data:rsvp}=await sb.from('event_rsvps').select('id').eq('user_id',CU.id).eq('event_id',ev.id).maybeSingle();
-    const has=!!rsvp;
+    const evRsvps=rsvpMap[ev.id]||[];
+    const has=evRsvps.some(r=>r.user_id===CU.id);
     const isMeeting=(ev.cat||'team')==='meeting';
     const catColor=isMeeting?'#6366f1':'#14b8a6';
     const tagColor={Dinner:'#f59e0b',Cocktail:'#ec4899',Lunch:'#22c55e',Meeting:'#6366f1','Official Dinner':'#f97316',Session:'#14b8a6'}[ev.type]||'#6366f1';
@@ -1060,6 +1069,17 @@ async function renderEvGrid(){
         return tc?`<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700;background:${tc.color}22;color:${tc.color};border:1px solid ${tc.color}44"><span style="width:14px;height:14px;border-radius:50%;background:${tc.color};color:#fff;font-size:7px;display:inline-flex;align-items:center;justify-content:center">${tc.initials[0]}</span>${tc.firstName}</span>`:email;
       }).join(' ');
       assignedHtml=`<div class="ev-dr" style="flex-wrap:wrap;gap:4px"><span class="ev-ico">👤</span>${pills}</div>`;
+    }
+    // Confirmed attendees list
+    let rsvpHtml='';
+    if(evRsvps.length){
+      const names=evRsvps.map(r=>r.profiles?.name||r.user_name||r.profiles?.email||'?');
+      rsvpHtml=`<div style="margin-top:10px;padding:10px 12px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.18);border-radius:8px">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#4ade80;margin-bottom:7px">✓ ${evRsvps.length} confirmation${evRsvps.length>1?'s':''}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px">
+          ${names.map(n=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);font-size:10px;font-weight:600;color:var(--t1)"><span style="width:14px;height:14px;border-radius:50%;background:rgba(34,197,94,.4);display:inline-flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff">${n[0].toUpperCase()}</span>${n}</span>`).join('')}
+        </div>
+      </div>`;
     }
     const card=document.createElement('div');card.className='ev-card';
     if(isAssigned)card.style.borderColor='rgba(99,102,241,.5)';
@@ -1079,6 +1099,7 @@ async function renderEvGrid(){
       ${ev.participants?`<div class="ev-dr"><span class="ev-ico">👥</span>${ev.participants}</div>`:''}
       ${assignedHtml}
       <div class="ev-dr" style="font-size:11px;color:var(--t3)">${ev.description||''}</div>
+      ${rsvpHtml}
       <div class="msgbox"><div class="msglbl">Message organisateur</div>
         <div class="msgtxt" id="mtxt-${ev.id}">${msg?msg.message:'Aucun message.'}</div>
         ${isKU()?`<textarea class="msginp" id="minp-${ev.id}" rows="2" placeholder="Point de rdv, instructions…">${msg?msg.message:''}</textarea>`:''}
@@ -1534,14 +1555,13 @@ async function toggleRsvp(eventId){
   if(isPresent){
     const{error}=await sb.from('event_rsvps').delete().eq('user_id',CU.id).eq('event_id',eventId);
     if(error){toast('Erreur: '+error.message);return;}
-    if(btn){btn.textContent='Confirmer présence';btn.classList.replace('btn-ac','btn-gh');}
     toast('Présence annulée');
   } else {
     const{error}=await sb.from('event_rsvps').insert({user_id:CU.id,event_id:eventId,user_name:CP?.name||CU.email});
     if(error){toast('Erreur: '+error.message);return;}
-    if(btn){btn.textContent='✓ Présent';btn.classList.replace('btn-gh','btn-ac');}
     toast('Présence confirmée ✓');
   }
+  renderEvGrid();
 }
 function openSessModal(s,attendees){
   const c=MCOL[s.type]||'#6366f1',isMine=myReg.has(s.id),canReg=s.type!=='break'&&s.type!=='event';
