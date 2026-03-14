@@ -1076,6 +1076,16 @@ async function renderEvGrid(){
   }
   buildPreConferenceCalendar();
 }
+async function saveEvMsg(eventId){
+  const inp=document.getElementById('minp-'+eventId);
+  if(!inp)return;
+  const message=inp.value.trim();
+  const{error}=await sb.from('event_messages').upsert({event_id:eventId,message,updated_by:CU.id,updated_at:new Date().toISOString()},{onConflict:'event_id'});
+  if(error){toast('Erreur: '+error.message);return;}
+  const txt=document.getElementById('mtxt-'+eventId);
+  if(txt)txt.textContent=message||'Aucun message.';
+  toast('Message sauvegardé ✓');
+}
 function openAddEvent(){
   editingEventId=null;
   document.getElementById('eem-title').textContent='Ajouter un événement';
