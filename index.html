@@ -878,18 +878,10 @@ function evStartTime(ev){return(ev.date.split('·')[1]||'').trim().split('–')[
 /* ═══════════════════════════════════════════════════════
    AUTH
 ═══════════════════════════════════════════════════════ */
+let signingIn=false;
+
 window.addEventListener('DOMContentLoaded',()=>{
-  // Mobile Safari private mode blocks localStorage — use sessionStorage as fallback
-  let storage;
-  try{localStorage.setItem('_test','1');localStorage.removeItem('_test');storage=localStorage;}
-  catch(e){storage=sessionStorage;}
-
-  sb=window.supabase.createClient(SB_URL,SB_KEY,{
-    auth:{storage,storageKey:'gfsi-auth',autoRefreshToken:true,persistSession:true,detectSessionInUrl:false}
-  });
-
-  // Guard against double-call on mobile
-  let signingIn=false;
+  sb=window.supabase.createClient(SB_URL,SB_KEY);
 
   sb.auth.getSession().then(({data:{session}})=>{
     if(session&&!CU&&!signingIn){signingIn=true;onSignedIn(session.user);}
@@ -1335,15 +1327,16 @@ async function saveAttendee(){
     if(a._db){await sb.from('attendees').update({name:obj.n,org:obj.o,group:obj.g}).eq('id',a.id);}
     customAttendees[editingAttIdx]={...a,...obj};
   } else {
-    const{data}=await sb.from('attendees').insert({name:obj.n,org:obj.o,group:obj.g}).select().single().catch(()=>({data:null}));
-    customAttendees.push(data?{n:data.name,o:data.org,g:data.group,id:data.id,_db:true}:obj);
+    let attInsertData=null;
+    try{const{data}=await sb.from('attendees').insert({name:obj.n,org:obj.o,group:obj.g}).select().single();attInsertData=data;}catch(e){}
+    customAttendees.push(attInsertData?{n:attInsertData.name,o:attInsertData.org,g:attInsertData.group,id:attInsertData.id,_db:true}:obj);
   }
   closeMo('edit-att-modal');toast('Participant enregistré ✓');buildAttendees();
 }
 async function deleteAttendee(){
   if(editingAttIdx===null||!confirm('Supprimer ce participant ?'))return;
   const a=customAttendees[editingAttIdx];
-  if(a._db)await sb.from('attendees').delete().eq('id',a.id).catch(()=>{});
+  if(a._db){try{await sb.from('attendees').delete().eq('id',a.id);}catch(e){}}
   customAttendees.splice(editingAttIdx,1);
   closeMo('edit-att-modal');toast('Participant supprimé');buildAttendees();
 }
@@ -1839,7 +1832,8 @@ async function buildPermissionsPanel(){
   const panel=document.getElementById('perm-panel');
   panel.innerHTML=`<div style="color:var(--t3);font-size:12px;padding:20px 0">Chargement…</div>`;
   // Load current perms from DB
-  const{data:dbPerms}=await sb.from('page_permissions').select('*').catch(()=>({data:[]}));
+  let dbPerms=[];
+  try{const{data}=await sb.from('page_permissions').select('*');dbPerms=data||[];}catch(e){}
   const permMap={};
   (dbPerms||[]).forEach(row=>{
     if(!permMap[row.page_key])permMap[row.page_key]={};
