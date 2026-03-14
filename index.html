@@ -904,29 +904,58 @@ window.addEventListener('DOMContentLoaded',()=>{
   });
 });
 async function doLogin(){
-  const email=document.getElementById('le').value.trim(),pass=document.getElementById('lp').value;
-  const err=document.getElementById('lerr');err.textContent='';
+  const email=document.getElementById('le').value.trim();
+  const pass=document.getElementById('lp').value;
+  const err=document.getElementById('lerr');
+  const btn=document.querySelector('#ls .bs');
+  err.textContent='';
   if(!email||!pass){err.textContent='Both fields required.';return;}
-  err.textContent='Signing in…';
-  const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
-  if(error)err.textContent='Error: '+error.message;
-  else if(data?.user){err.textContent='';onSignedIn(data.user);}
+  // Show loading state
+  err.textContent='Connexion en cours…';
+  err.style.color='var(--t3)';
+  if(btn){btn.disabled=true;btn.textContent='Signing in…';}
+  try{
+    const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error){
+      err.textContent='Erreur: '+error.message;
+      err.style.color='var(--re)';
+      if(btn){btn.disabled=false;btn.textContent='Sign In →';}
+      return;
+    }
+    // Success — onAuthStateChange will call onSignedIn
+    // But as a fallback for Android Chrome which sometimes misses the event:
+    if(data?.user&&!signingIn){
+      signingIn=true;
+      await onSignedIn(data.user);
+    }
+  }catch(e){
+    err.textContent='Erreur réseau: '+e.message;
+    err.style.color='var(--re)';
+    if(btn){btn.disabled=false;btn.textContent='Sign In →';}
+  }
 }
 async function onSignedIn(user){
   if(CU)return;
   CU=user;
+  const err=document.getElementById('lerr');
+  const btn=document.querySelector('#ls .bs');
   try{
+    err.textContent='Chargement du profil…';err.style.color='var(--t3)';
     const{data,error}=await sb.from('profiles').select('*').eq('id',user.id).single();
-    if(error&&error.code!=='PGRST116')console.warn('Profile load error:',error.message);
     CP=data||{name:user.email.split('@')[0],role:'member'};
     if(CP.role==='disabled'){
-      toast('Account disabled — contact your administrator','error');
-      await sb.auth.signOut();
-      CU=null;CP=null;
-      return;
+      err.textContent='Compte désactivé — contactez votre administrateur.';
+      err.style.color='var(--re)';
+      if(btn){btn.disabled=false;btn.textContent='Sign In →';}
+      await sb.auth.signOut();CU=null;CP=null;signingIn=false;return;
     }
+    err.textContent='Chargement des permissions…';
     await loadPermissions();
+    err.textContent='Chargement des données…';
     await loadAllData();
+    // Show app
+    err.textContent='';
+    if(btn){btn.disabled=false;btn.textContent='Sign In →';}
     document.getElementById('ls').style.display='none';
     document.getElementById('app').style.display='block';
     document.getElementById('bottom-nav').style.display='block';
@@ -940,10 +969,10 @@ async function onSignedIn(user){
     buildAttendees();
     buildEvents();
   }catch(e){
-    console.error('onSignedIn error:',e);
-    toast('Erreur de chargement — réessayez','error');
-    CU=null;CP=null;
-    await sb.auth.signOut();
+    err.textContent='Erreur: '+e.message;
+    err.style.color='var(--re)';
+    if(btn){btn.disabled=false;btn.textContent='Sign In →';}
+    CU=null;CP=null;signingIn=false;
   }
 }
 async function doLogout(){await sb.auth.signOut();}
