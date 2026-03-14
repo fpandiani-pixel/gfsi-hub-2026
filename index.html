@@ -460,7 +460,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
 
     <!-- FULL WEEK VIEW -->
     <div class="page" id="page-week">
-      <div class="topbar"><div><div class="tb-title">Full Week View</div><div class="tb-sub">All days · all sessions · complete overview</div></div></div>
+      <div class="topbar"><div><div class="tb-title">Full Week View</div><div class="tb-sub">All days · all sessions · complete overview</div></div><button class="btn btn-gh btn-sm" onclick="openNewSlot()" style="display:flex;align-items:center;gap:5px">✏ Ajouter un créneau</button></div>
       <div class="content">
         <div id="week-member-legend" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;"></div>
         <!-- Mobile day tabs -->
@@ -1914,6 +1914,8 @@ function openAddSession(){
   document.getElementById('esm-default-warn').style.display='none';
   document.getElementById('edit-sess-modal').classList.add('open');
 }
+
+function openNewSlot(){openAddSession();}
 
 function openEditSession(id){
   const s=SESSIONS.find(s=>s.id===id);if(!s)return;
