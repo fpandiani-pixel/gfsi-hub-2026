@@ -269,63 +269,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
 .att-name{font-size:12px;font-weight:600;color:var(--t1);}
 .att-org{font-size:10px;color:var(--t3);}
 .att-grp{font-size:9px;margin-top:2px;}
-
-/* ── MOBILE HAMBURGER BUTTON ── */
-#mob-menu-btn{display:none;position:fixed;top:12px;left:12px;z-index:200;background:var(--s2);border:1px solid var(--bd2);border-radius:8px;width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--t1);}
-#mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90;backdrop-filter:blur(2px);}
-
-/* ── RESPONSIVE ── */
-@media(max-width:768px){
-  :root{--nav:240px;}
-  #mob-menu-btn{display:flex;}
-  .sidebar{transform:translateX(-100%);transition:transform .25s ease;z-index:150;}
-  .sidebar.mob-open{transform:translateX(0);}
-  #mob-overlay.mob-open{display:block;}
-  .main{margin-left:0;}
-  .topbar{padding:12px 14px 12px 58px;}
-  .content{padding:14px;}
-  .lc{width:95vw;padding:32px 20px;}
-  /* Topbar actions wrap */
-  .topbar{flex-wrap:wrap;gap:6px;}
-  /* Booth grid scroll hint */
-  #booth-grid{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  /* Stats grid */
-  #booth-stats{grid-template-columns:repeat(2,1fr)!important;}
-  /* Day tabs scroll */
-  .dtabs{overflow-x:auto;padding-bottom:4px;flex-wrap:nowrap;}
-  .dtab{flex-shrink:0;}
-  /* Session cards */
-  .sc-time{width:58px;}
-  /* Team calendar */
-  .tcal-wrap,.week-cal{-webkit-overflow-scrolling:touch;}
-  /* Feedback grid */
-  .fdb-grid{grid-template-columns:repeat(2,1fr)!important;}
-  /* Admin stats */
-  .sg{grid-template-columns:repeat(2,1fr)!important;}
-  /* Form rows */
-  .fgr,.fgr3{grid-template-columns:1fr!important;}
-  /* Modal */
-  .md{padding:18px;width:96vw!important;max-height:92vh;}
-  /* Meetings table */
-  .mt-wrap{-webkit-overflow-scrolling:touch;}
-  /* Events grid */
-  .ev-grid{grid-template-columns:1fr!important;}
-  /* Topbar title smaller */
-  .tb-title{font-size:14px;}
-  .tb-sub{display:none;}
-}
-@media(max-width:480px){
-  .content{padding:10px;}
-  #booth-stats{grid-template-columns:1fr 1fr!important;}
-  .vsw{display:none;}
-}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="mob-menu-btn" onclick="toggleMobMenu()">☰</div>
-<div id="mob-overlay" onclick="closeMobMenu()"></div>
 <div id="ls">
   <div class="lc">
     <div class="ll"><div class="lm">GF</div><div><div class="lt">GFSI Hub 2026</div><div class="ls2">Vancouver · March 22–26</div></div></div>
@@ -341,7 +288,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <div class="sidebar">
     <div class="sbh"><div class="sblogo"><div class="sbmark">GF</div><div><div class="sbtxt">GFSI Hub</div><div class="sbsub">Vancouver 2026</div></div></div></div>
@@ -366,7 +312,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
 
   <div class="main">
 
-    <!-- MY AGENDA -->
     <div class="page active" id="page-agenda">
       <div class="topbar">
         <div><div class="tb-title">My Agenda</div><div class="tb-sub">Conference sessions · join to build your personal schedule</div></div>
@@ -390,7 +335,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- FULL WEEK VIEW -->
     <div class="page" id="page-week">
       <div class="topbar"><div><div class="tb-title">Full Week View</div><div class="tb-sub">All days · all sessions · complete overview</div></div></div>
       <div class="content">
@@ -399,7 +343,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- TEAM CALENDAR -->
     <div class="page" id="page-team">
       <div class="topbar"><div><div class="tb-title">Team Calendar</div><div class="tb-sub">Shared schedule · who is attending what</div></div></div>
       <div class="content">
@@ -409,7 +352,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- MEETING ROOMS -->
     <div class="page" id="page-meetings">
       <div class="topbar">
         <div><div class="tb-title">Meeting Rooms</div><div class="tb-sub">Pre-conference & side meetings · all days</div></div>
@@ -421,7 +363,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- ATTENDEES -->
     <div class="page" id="page-attendees">
       <div class="topbar"><div><div class="tb-title">Attendees</div><div class="tb-sub">32 participants · SteerCo members & GFSI team</div></div><div id="att-add-btn"></div></div>
       <div class="content">
@@ -430,7 +371,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- SOCIAL EVENTS -->
     <div class="page" id="page-events">
       <div class="topbar">
         <div><div class="tb-title">Events &amp; Meetings</div><div class="tb-sub">Calendrier · événements sociaux · réunions internes</div></div>
@@ -447,7 +387,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- FEEDBACK FORM -->
     <div class="page" id="page-feedback">
       <div class="topbar"><div><div class="tb-title">Submit Feedback</div><div class="tb-sub">Detailed responses go directly to the organiser</div></div></div>
       <div class="content">
@@ -476,7 +415,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- FEEDBACK DASHBOARD -->
     <div class="page" id="page-feedbackdash">
       <div class="topbar">
         <div><div class="tb-title">Feedback Dashboard</div><div class="tb-sub">Consolidated comments & ratings from all team members</div></div>
@@ -490,7 +428,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
     </div>
 
 
-    <!-- BOOTH GFSI -->
     <div class="page" id="page-booth">
       <div class="topbar">
         <div><div class="tb-title">&#127979; GFSI Booth</div><div class="tb-sub">Planning des présences au stand · Vancouver Convention Centre</div></div>
@@ -500,25 +437,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
       <div class="content">
 
-        <!-- Legend + stats -->
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px" id="booth-stats"></div>
 
-        <!-- Day tabs -->
         <div class="dtabs" id="booth-day-tabs" style="margin-bottom:16px"></div>
 
-        <!-- Grid: time slots x team members -->
         <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;overflow:hidden;overflow-x:auto">
           <div id="booth-grid"></div>
         </div>
 
-        <!-- My slots summary -->
         <div id="booth-my-slots" style="margin-top:20px"></div>
 
       </div>
     </div>
 
 
-    <!-- ADMIN CONSOLE -->
     <div class="page" id="page-admin">
       <div class="topbar"><div><div class="tb-title">Admin Console</div><div class="tb-sub">Users · access management · data overview</div></div></div>
       <div class="content">
@@ -595,10 +527,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
   </div>
 </div>
 
-<!-- SESSION MODAL -->
 <div class="mo" id="sess-modal"><div class="md"><button class="mdx" onclick="closeMo('sess-modal')">✕</button><div id="sess-modal-content"></div></div></div>
 
-<!-- EDIT EVENT MODAL -->
 <div class="mo" id="edit-event-modal"><div class="md" style="width:620px"><button class="mdx" onclick="closeMo('edit-event-modal')">&#10005;</button>
   <div class="md-title" id="eem-title">Modifier l'&eacute;v&eacute;nement</div>
   <div id="eem-default-warn" style="display:none;margin:10px 0;padding:9px 12px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:7px;font-size:11px;color:#fbbf24">
@@ -646,7 +576,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
   </div>
 </div></div>
 
-<!-- EDIT MEETING MODAL -->
 <div class="mo" id="edit-meeting-modal"><div class="md" style="width:580px"><button class="mdx" onclick="closeMo('edit-meeting-modal')">✕</button>
   <div class="md-title" id="emm-title">Edit Meeting</div>
   <div style="margin-top:16px">
@@ -763,4 +692,535 @@ const DEFAULT_EVENTS=[
   // ── MEETINGS ──
   {id:'ev4',title:'CPO Forum',type:'Meeting',cat:'meeting',date:'Tuesday Mar 24 · 10:00–12:00',location:'Room 121 & 122',description:'CPO Forum session.',participants:'Mark, Howard, Deann, Tom, Liz and Franck',assignedTo:['e.andohkesson'+'@'+'theconsumergoodsforum.com','k.mijatovic'+'@'+'theconsumergoodsforum.com']},
   {id:'ev7',title:'GFSI Local Group Members Meet',type:'Meeting',cat:'meeting',date:'Wednesday Mar 25 · 13:45–14:15',location:'Room 121 & 122',description:'GFSI Local Group Members gathering.',participants:'Mark, Howard, Liz, Franck, Chayanika',assignedTo:['c.talukdar'+'@'+'theconsumergoodsforum.com','e.andohkesson'+'@'+'theconsumergoodsforum.com']},
-  {id:'ev9',title:'BHWG Meeting',type:'Meeting',cat:'meeting',date:'Thursday Mar 26 · 14:00–17:00',location:'Room 121 & 122',description:'BHWG dedicated meeting.',participants:'GFSI Team Only',assignedTo:['e.andohkesson'+'@'+'theconsumergoodsforum.com','aa.nyarko'+'@'+'theconsumergoodsf
+  {id:'ev9',title:'BHWG Meeting',type:'Meeting',cat:'meeting',date:'Thursday Mar 26 · 14:00–17:00',location:'Room 121 & 122',description:'BHWG dedicated meeting.',participants:'GFSI Team Only',assignedTo:['e.andohkesson'+'@'+'theconsumergoodsforum.com','aa.nyarko'+'@'+'theconsumergoodsforum.com','k.mijatovic'+'@'+'theconsumergoodsforum.com','e.skouse'+'@'+'theconsumergoodsforum.com']},
+  {id:'ev10',title:'Steering Committee',type:'Meeting',cat:'meeting',date:'Sunday Mar 22 · 09:00–17:00',location:'Room 121 & 122',description:'Full day Steering Committee. Breakfast 9AM, Lunch 12–1PM, Break 3:15PM.',participants:'All SteerCo & GFSI Team',assignedTo:['e.andohkesson'+'@'+'theconsumergoodsforum.com','c.talukdar'+'@'+'theconsumergoodsforum.com','aa.nyarko'+'@'+'theconsumergoodsforum.com','k.mijatovic'+'@'+'theconsumergoodsforum.com','e.skouse'+'@'+'theconsumergoodsforum.com']},
+  {id:'ev11',title:'Steering Committee',type:'Meeting',cat:'meeting',date:'Monday Mar 23 · 09:00–17:00',location:'Room 121 & 122',description:'Full day Steering Committee. Breakfast 9AM, Lunch 12–1PM, Break 3PM.',participants:'All SteerCo & GFSI Team',assignedTo:['e.andohkesson'+'@'+'theconsumergoodsforum.com','c.talukdar'+'@'+'theconsumergoodsforum.com','aa.nyarko'+'@'+'theconsumergoodsforum.com','k.mijatovic'+'@'+'theconsumergoodsforum.com','e.skouse'+'@'+'theconsumergoodsforum.com']},
+  {id:'ev12',title:'EMEA LG Meeting',type:'Meeting',cat:'meeting',date:'Monday Mar 23 · 10:00–15:00',location:'Room 108 (GFSI Office)',description:'EMEA Local Group Meeting. U-shape, lunch boxes.',participants:'14 participants',assignedTo:['c.talukdar'+'@'+'theconsumergoodsforum.com']},
+  {id:'ev13',title:'Steering Committee & Students Session',type:'Meeting',cat:'meeting',date:'Monday Mar 23 · 17:00–19:00',location:'Room 121 & 122',description:'Steering Committee and Students session.',participants:'All SteerCo & GFSI Team',assignedTo:['e.andohkesson'+'@'+'theconsumergoodsforum.com','c.talukdar'+'@'+'theconsumergoodsforum.com']},
+  {id:'ev14',title:'All LG Members Meet',type:'Meeting',cat:'meeting',date:'Wednesday Mar 25 · 13:45–14:30',location:'Room 121 & 122',description:'All Local Group Members gathering. 40 attendees.',participants:'All LG Members',assignedTo:['c.talukdar'+'@'+'theconsumergoodsforum.com','e.andohkesson'+'@'+'theconsumergoodsforum.com']},
+  {id:'ev15',title:'US/Can Local Group Meeting',type:'Meeting',cat:'meeting',date:'Wednesday Mar 25 · 15:30–17:00',location:'Room 121 & 122',description:'US/Canada Local Group Meeting. Tea & snacks. Zoom available.',participants:'15 participants',assignedTo:['c.talukdar'+'@'+'theconsumergoodsforum.com']}
+];
+
+// GFSI Team contacts for bulk creation & meeting assignment
+const TEAM_CONTACTS=[
+  {firstName:'Elizabeth',lastName:'Andoh-Kesson',name:'Elizabeth Andoh-Kesson',title:'Interim Director',email:'e.andohkesson'+'@'+'theconsumergoodsforum.com',phone:'+33 1 82 00 95 91',location:'Paris, FR',role:'keyuser',initials:'EAK',color:'#6366f1'},
+  {firstName:'Kenya',lastName:'Tillerson',name:'Kenya Tillerson',title:'Senior Communications Manager',email:'k.tillerson'+'@'+'theconsumergoodsforum.com',phone:'+1 301 563 3383',location:'USA',role:'keyuser',initials:'KT',color:'#14b8a6'},
+  {firstName:'Chayanika',lastName:'Talukdar',name:'Chayanika Talukdar',title:'Community Manager',email:'c.talukdar'+'@'+'theconsumergoodsforum.com',phone:'+33 1 82 00 95 95',location:'Paris, FR',role:'keyuser',initials:'CT',color:'#f59e0b'},
+  {firstName:'Awura Abena Lily',lastName:'Nyarko',name:'Awura Abena Lily Nyarko',title:'Technical Manager',email:'aa.nyarko'+'@'+'theconsumergoodsforum.com',phone:'+33 1 82 00 95 89',location:'Paris, FR',role:'keyuser',initials:'AN',color:'#22c55e'},
+  {firstName:'Karla',lastName:'Mijatovic',name:'Karla Mijatovic',title:'Senior Technical Manager',email:'k.mijatovic'+'@'+'theconsumergoodsforum.com',phone:'+33 1 82 00 95 62',location:'Paris, FR',role:'keyuser',initials:'KM',color:'#ec4899'},
+  {firstName:'Emma',lastName:'Skouse',name:'Emma Skouse',title:'Benchmark Leader',email:'e.skouse'+'@'+'theconsumergoodsforum.com',phone:'+33 1 82 00 95 73',location:'Paris, FR',role:'member',initials:'ES',color:'#f97316'},
+  {firstName:'Karen',lastName:'Betts',name:'Karen Betts',title:'Benchmark Leader',email:'support'+'@'+'gfsiaudits.org',phone:'—',location:'UK',role:'member',initials:'KB',color:'#8b5cf6'}
+];
+
+const ATTENDEES=[
+  {n:'Mark Fryling',o:'General Mills',g:'GFSI SteerCo'},
+  {n:'Howard Popoola',o:'Kroger',g:'GFSI SteerCo'},
+  {n:'Tom Wiester',o:'Starbucks',g:'GFSI SteerCo'},
+  {n:'Deann Akins-Lewenthal',o:'Mondelez',g:'GFSI SteerCo'},
+  {n:'Eduardo Martinez',o:'RBI International',g:'GFSI SteerCo'},
+  {n:'Cindy Jenks',o:'Pick n Pay',g:'GFSI SteerCo'},
+  {n:'Olivier Mignot',o:'Nestle',g:'GFSI SteerCo'},
+  {n:'Mahirwan Bhagia',o:'Pepsi',g:'GFSI SteerCo'},
+  {n:'Kazuaki Miyagishima',o:'Aeon',g:'GFSI SteerCo'},
+  {n:'Mark Beaumont',o:'Danone',g:'GFSI SteerCo'},
+  {n:'Silvia Pereira',o:'Mars',g:'GFSI SteerCo'},
+  {n:'Monique Pellegrino',o:'Ferrero',g:'GFSI SteerCo'},
+  {n:'Amy Parks',o:'Dole',g:'GFSI SteerCo'},
+  {n:'Brian T Olney',o:'Wegmans',g:'GFSI SteerCo'},
+  {n:'Robert Prevendar',o:'Yum! Brands',g:'GFSI SteerCo'},
+  {n:'Kelvin Chen',o:'Wumart',g:'GFSI SteerCo'},
+  {n:'Kristine Williams',o:'The Coca Cola Company',g:'GFSI SteerCo'},
+  {n:'Wai Chan Chan',o:'CGF Managing Director',g:'CGF'},
+  {n:'Elizabeth Andoh-Kesson',o:'GFSI Interim Director',g:'CGF'},
+  {n:'Chayanika Talukdar',o:'GFSI Community Manager',g:'CGF'},
+  {n:'Awura Abena Lily Nyarko',o:'GFSI Technical Officer',g:'CGF'},
+  {n:'Emma Skouse',o:'GFSI Benchmark Leader',g:'CGF'},
+  {n:'Karla Mijatovic',o:'GFSI Senior Technical Manager',g:'CGF'},
+  {n:'Franck Pandiani',o:'GFSI Head of Operations',g:'CGF'},
+  {n:'Richa Bedi-Navik',o:'GFSI Consultant',g:'Consultant'},
+  {n:'Alec Kyriakides',o:'GFSI Consultant',g:'Consultant'},
+  {n:'Roy Kirby',o:'GFSI Consultant',g:'Consultant'},
+  {n:'Tsutomu Okubo',o:'CGF',g:'CGF'},
+  {n:'Yang Ying Xu',o:'CGF',g:'CGF'},
+  {n:'Lingling Zhou',o:'CGF',g:'CGF'},
+  {n:'Wesley Wilson',o:'CGF',g:'CGF'},
+  {n:'Erika Rodriguez',o:'CGF',g:'CGF'}
+];
+
+let meetings=[...DEFAULT_MEETINGS];
+let events=[...DEFAULT_EVENTS];
+let editingMeetingId=null,editingEventId=null;
+let currentDay='day1',teamDay='day1',agView='cards';
+
+function t2m(t){const[h,m]=t.split(':').map(Number);return h*60+(m||0);}
+function isKU(){return CP&&(KU_ROLES.includes(CP.role)||CU?.email===ADMIN);}
+function ini(n){return(n||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+
+/* ── AUTH ── */
+window.addEventListener('DOMContentLoaded',()=>{
+  sb=window.supabase.createClient(SB_URL,SB_KEY);
+  sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});
+  sb.auth.onAuthStateChange((ev,session)=>{
+    if(ev==='SIGNED_IN'&&session&&!CU)onSignedIn(session.user);
+    if(ev==='SIGNED_OUT'){CU=null;document.getElementById('ls').style.display='flex';document.getElementById('app').style.display='none';}
+  });
+});
+
+async function doLogin(){
+  try {
+    const email=document.getElementById('le').value.trim(), pass=document.getElementById('lp').value;
+    const err=document.getElementById('lerr');
+    err.textContent='';
+    
+    if(!email||!pass){err.textContent='Both fields required.';return;}
+    
+    err.textContent='Signing in…';
+    const {data, error} = await sb.auth.signInWithPassword({email,password:pass});
+    
+    if(error) {
+      err.textContent='Error: '+error.message;
+    } else if(data?.user) {
+      err.textContent='Success! Loading...'; 
+      await onSignedIn(data.user);
+    }
+  } catch (e) {
+    document.getElementById('lerr').textContent='Crash during login. Check Console.';
+    console.error("Login Crash:", e);
+  }
+}
+
+async function onSignedIn(user){
+  try {
+    if(CU)return; CU=user;
+    
+    const {data, error: profileErr} = await sb.from('profiles').select('*').eq('id',user.id).single();
+    if (profileErr) console.warn("Profile fetch warning:", profileErr.message);
+    
+    const fallbackName = (user.email || 'user@domain').split('@')[0];
+    CP = data || {name: fallbackName, role: 'member'};
+    
+    // Hide Login Screen FIRST
+    document.getElementById('ls').style.display='none';
+    document.getElementById('app').style.display='block';
+    
+    // Populate Sidebar
+    document.getElementById('sbav').textContent=ini(CP.name||user.email||'??');
+    document.getElementById('sbun').textContent=CP.name||user.email||'Unknown';
+    document.getElementById('sbrl').textContent=CP.role==='admin'?'Administrator':CP.role==='keyuser'?'Key User':'Member';
+    
+    if(isKU()){
+      document.getElementById('adm-ngl').style.display='block';
+      document.getElementById('adm-ni').style.display='flex';
+    }
+    
+    // Load Data Safely
+    await loadCustomMeetings();
+    await loadCustomEvents();
+    await loadCustomSessions();
+    
+    buildAgenda();
+    buildFeedbackSelect();
+    buildAttendees();
+    buildEvents();
+    
+  } catch (e) {
+    console.error("Error building the dashboard UI:", e);
+    alert("An error occurred while loading parts of the dashboard. Check the console.");
+  }
+}
+
+async function doLogout(){await sb.auth.signOut();}
+
+/* ── MEETINGS ── */
+async function loadCustomMeetings(){
+  const{data}=await sb.from('custom_meetings').select('*').order('date_order');
+  if(data&&data.length)meetings=[...DEFAULT_MEETINGS,...data.map(d=>({...d,_custom:true}))];
+  else meetings=[...DEFAULT_MEETINGS];
+  renderMeetings();
+}
+async function loadCustomEvents(){
+  const{data}=await sb.from('custom_events').select('*');
+  if(data&&data.length)events=[...data.map(d=>({...d,_custom:true}))];
+  else events=[];
+  buildEvents();
+}
+
+let mFilter='All';
+function buildMeetings(){
+  // Show add button for key users
+  const ab=document.getElementById('add-meeting-btn');
+  if(isKU())ab.innerHTML='<button class="btn btn-ac btn-sm" onclick="openAddMeeting()">+ Add Meeting</button>';
+  if(isKU())document.getElementById('meet-edit-col').style.display='';
+  const days=[...new Set(meetings.map(m=>m.day))];
+  const rf=document.getElementById('mrf');rf.innerHTML='';
+  ['All',...days].forEach(d=>{const b=document.createElement('button');b.className='rfb'+(d===mFilter?' active':'');b.textContent=d;b.onclick=()=>{mFilter=d;document.querySelectorAll('.rfb').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderMeetings();};rf.appendChild(b);});
+  renderMeetings();
+}
+function renderMeetings(){
+  const tb=document.getElementById('mtbody');tb.innerHTML='';
+  const list=mFilter==='All'?meetings:meetings.filter(m=>m.day===mFilter);
+  list.forEach(m=>{
+    const tr=document.createElement('tr');
+    const yt=v=>v&&v!=='No'&&v!=='—'&&v!=='No '?`<span class="yt">${v}</span>`:`<span class="nt">No</span>`;
+    tr.innerHTML=`<td>${m.by||''}</td><td>${m.name||''}</td><td>${m.room||''}</td><td>${m.date||''}</td><td>${m.day||''}</td><td style="white-space:nowrap">${m.timing||''}</td><td>${m.people||''}</td><td>${m.setup||''}</td><td style="font-size:10px;max-width:150px">${m.fb||''}</td><td style="font-size:10px">${m.other||''}</td><td>${yt(m.zoom)}</td><td style="font-size:10px;max-width:160px">${m.av||''}</td>${isKU()?`<td><button class="btn btn-gh btn-xs" onclick="openEditMeeting('${m.id}')">Edit</button></td>`:''}`;
+    tb.appendChild(tr);
+  });
+}
+function openAddMeeting(){
+  editingMeetingId=null;
+  document.getElementById('emm-title').textContent='Add Meeting';
+  ['by','name','room','date','day','time','ppl','setup','fb','other','zoom','av'].forEach(f=>document.getElementById('emm-'+f).value='');
+  document.getElementById('del-mtg-btn').style.display='none';
+  document.getElementById('edit-meeting-modal').classList.add('open');
+}
+function openEditMeeting(id){
+  const m=meetings.find(x=>x.id===id);if(!m)return;
+  editingMeetingId=id;
+  document.getElementById('emm-title').textContent='Edit Meeting';
+  document.getElementById('emm-by').value=m.by||'';
+  document.getElementById('emm-name').value=m.name||'';
+  document.getElementById('emm-room').value=m.room||'';
+  document.getElementById('emm-date').value=m.date||'';
+  document.getElementById('emm-day').value=m.day||'';
+  document.getElementById('emm-time').value=m.timing||'';
+  document.getElementById('emm-ppl').value=m.people||'';
+  document.getElementById('emm-setup').value=m.setup||'';
+  document.getElementById('emm-fb').value=m.fb||'';
+  document.getElementById('emm-other').value=m.other||'';
+  document.getElementById('emm-zoom').value=m.zoom||'';
+  document.getElementById('emm-av').value=m.av||'';
+  document.getElementById('del-mtg-btn').style.display=m._custom?'inline-flex':'none';
+  document.getElementById('edit-meeting-modal').classList.add('open');
+}
+async function saveMeeting(){
+  const obj={
+    by:document.getElementById('emm-by').value,name:document.getElementById('emm-name').value,
+    room:document.getElementById('emm-room').value,date:document.getElementById('emm-date').value,
+    day:document.getElementById('emm-day').value,timing:document.getElementById('emm-time').value,
+    people:document.getElementById('emm-ppl').value,setup:document.getElementById('emm-setup').value,
+    fb:document.getElementById('emm-fb').value,other:document.getElementById('emm-other').value,
+    zoom:document.getElementById('emm-zoom').value,av:document.getElementById('emm-av').value,
+    date_order:document.getElementById('emm-date').value+document.getElementById('emm-time').value
+  };
+  if(editingMeetingId&&meetings.find(m=>m.id===editingMeetingId)?._custom){
+    await sb.from('custom_meetings').update(obj).eq('id',editingMeetingId);
+  } else if(!editingMeetingId){
+    const{data}=await sb.from('custom_meetings').insert({...obj}).select().single();
+    if(data)meetings.push({...data,_custom:true});
+  } else {
+    // Edit a default meeting — save override
+    const{data}=await sb.from('custom_meetings').insert({...obj}).select().single();
+    if(data)meetings=[meetings.filter(m=>m.id!==editingMeetingId),{...data,_custom:true}].flat();
+  }
+  await loadCustomMeetings();
+  closeMo('edit-meeting-modal');toast('Meeting saved ✓');
+}
+async function deleteMeeting(){
+  if(!editingMeetingId)return;
+  await sb.from('custom_meetings').delete().eq('id',editingMeetingId);
+  meetings=meetings.filter(m=>m.id!==editingMeetingId);
+  renderMeetings();closeMo('edit-meeting-modal');toast('Meeting deleted');
+}
+
+/* ── EVENTS ── */
+let evCatFilter='team'; // Default: show only team events in cards, meetings are in calendar
+async function buildEvents(){
+  const ab=document.getElementById('add-event-btn');
+  if(isKU())ab.innerHTML='<button class="btn btn-ac btn-sm" onclick="openAddEvent()">+ Ajouter</button>';
+  const tabWrap=document.getElementById('ev-cat-tabs');
+  if(tabWrap){
+    tabWrap.innerHTML=[{k:'team',l:'🎉 Team Events'},{k:'meeting',l:'🏛 Meetings'},{k:'all',l:'Voir tout'}]
+      .map(t=>`<button class="dtab${evCatFilter===t.k?' active':''}" onclick="setEvCat('${t.k}',this)">${t.l}</button>`).join('');
+  }
+  await renderEvGrid();
+}
+function setEvCat(cat,btn){
+  evCatFilter=cat;
+  document.querySelectorAll('#ev-cat-tabs .dtab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderEvGrid();
+}
+async function renderEvGrid(){
+  const grid=document.getElementById('ev-grid');grid.innerHTML='';
+  const{data:msgs}=await sb.from('event_messages').select('*');
+  const mm={};if(msgs)msgs.forEach(m=>mm[m.event_id]=m);
+  // Merge defaults + custom overrides — custom wins
+  const merged=[...DEFAULT_EVENTS];
+  (events||[]).filter(e=>e._custom).forEach(ce=>{
+    const idx=merged.findIndex(d=>d.id===ce.id||(ce._override_id&&d.id===ce._override_id));
+    if(idx>=0)merged[idx]={...merged[idx],...ce}; else merged.push(ce);
+  });
+  // 'team' = social/dinners only, 'meeting' = internal meetings, 'all' = everything
+  const filtered=evCatFilter==='all'?merged:merged.filter(e=>(e.cat||'team')===evCatFilter);
+  for(const ev of filtered){
+    const msg=mm[ev.id];
+    const{data:rsvp}=await sb.from('event_rsvps').select('id').eq('user_id',CU.id).eq('event_id',ev.id).maybeSingle();
+    const has=!!rsvp;
+    const isMeeting=(ev.cat||'team')==='meeting';
+    const catColor=isMeeting?'#6366f1':'#14b8a6';
+    const tagColor={Dinner:'#f59e0b',Cocktail:'#ec4899',Lunch:'#22c55e',Meeting:'#6366f1','Official Dinner':'#f97316',Session:'#14b8a6'}[ev.type]||'#6366f1';
+    const userEmail=CU?.email||'';
+    const isAssigned=ev.assignedTo&&ev.assignedTo.includes(userEmail);
+    let assignedHtml='';
+    if(ev.assignedTo&&ev.assignedTo.length){
+      const pills=ev.assignedTo.map(email=>{
+        const tc=TEAM_CONTACTS.find(c=>c.email===email);
+        return tc?`<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700;background:${tc.color}22;color:${tc.color};border:1px solid ${tc.color}44"><span style="width:14px;height:14px;border-radius:50%;background:${tc.color};color:#fff;font-size:7px;display:inline-flex;align-items:center;justify-content:center">${tc.initials[0]}</span>${tc.firstName}</span>`:email;
+      }).join(' ');
+      assignedHtml=`<div class="ev-dr" style="flex-wrap:wrap;gap:4px"><span class="ev-ico">👤</span>${pills}</div>`;
+    }
+    const card=document.createElement('div');card.className='ev-card';
+    if(isAssigned)card.style.borderColor='rgba(99,102,241,.5)';
+    card.innerHTML=`<div class="ev-top" style="border-left:3px solid ${catColor}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:${catColor};margin-bottom:4px">${isMeeting?'Meeting':'Team Event'}</div>
+          <div class="ev-ttl">${ev.title}</div>
+        </div>
+        <span class="ev-tag" style="background:${tagColor}22;color:${tagColor};border:1px solid ${tagColor}44">${ev.type}</span>
+      </div>
+      ${isKU()?`<button class="btn btn-gh btn-xs" style="margin-top:8px" onclick="openEditEvent('${ev.id}')">✏ Modifier</button>`:''}
+    </div>
+    <div class="ev-body">
+      <div class="ev-dr"><span class="ev-ico">📅</span>${ev.date}</div>
+      <div class="ev-dr"><span class="ev-ico">📍</span>${ev.location}</div>
+      ${ev.participants?`<div class="ev-dr"><span class="ev-ico">👥</span>${ev.participants}</div>`:''}
+      ${assignedHtml}
+      <div class="ev-dr" style="font-size:11px;color:var(--t3)">${ev.description||''}</div>
+      <div class="msgbox"><div class="msglbl">Message organisateur</div>
+        <div class="msgtxt" id="mtxt-${ev.id}">${msg?msg.message:'Aucun message.'}</div>
+        ${isKU()?`<textarea class="msginp" id="minp-${ev.id}" rows="2" placeholder="Point de rdv, instructions…">${msg?msg.message:''}</textarea>`:''}
+      </div>
+    </div>
+    <div class="ev-foot">
+      ${isKU()?`<button class="btn btn-am btn-sm" onclick="saveEvMsg('${ev.id}')">Sauver message</button>`:''}
+      ${isAssigned?`<span class="pill pill-pu" style="font-size:10px">✓ Assigné à vous</span>`:''}
+      <button class="btn btn-sm ${has?'btn-ac':'btn-gh'}" id="rsvpb-${ev.id}" onclick="toggleRsvp('${ev.id}')">${has?'✓ Présent':'Confirmer présence'}</button>
+    </div>`;
+    grid.appendChild(card);
+  }
+  buildPreConferenceCalendar();
+}
+function openAddEvent(){
+  editingEventId=null;
+  document.getElementById('eem-title').textContent='Ajouter un événement';
+  ['ttl','loc','desc','part','assigned'].forEach(f=>{const el=document.getElementById('eem-'+f);if(el)el.value='';});
+  document.getElementById('eem-type').value='Meeting';
+  document.getElementById('eem-cat').value='meeting';
+  document.getElementById('eem-day').value='Sunday Mar 22';
+  document.getElementById('eem-start').value='';
+  document.getElementById('eem-end').value='';
+  document.getElementById('del-event-btn').style.display='none';
+  document.getElementById('eem-default-warn').style.display='none';
+  document.getElementById('edit-event-modal').classList.add('open');
+}
+function openAddEventOnDay(dayVal){
+  openAddEvent();
+  document.getElementById('eem-day').value=dayVal;
+}
+function openEditEvent(id){
+  const allEvs=[...DEFAULT_EVENTS,...(events||[]).filter(e=>e._custom)];
+  const ev=allEvs.find(e=>e.id===id);if(!ev)return;
+  editingEventId=id;
+  const isDefault=DEFAULT_EVENTS.some(e=>e.id===id)&&!(events||[]).find(e=>e.id===id&&e._custom);
+  document.getElementById('eem-title').textContent='Modifier l\'événement';
+  document.getElementById('eem-default-warn').style.display=isDefault?'block':'none';
+  document.getElementById('eem-ttl').value=ev.title||'';
+  document.getElementById('eem-type').value=ev.type||'Meeting';
+  document.getElementById('eem-cat').value=ev.cat||'team';
+  const dateStr=ev.date||'';
+  const dayOpts=['Sunday Mar 22','Monday Mar 23','Tuesday Mar 24','Wednesday Mar 25','Thursday Mar 26'];
+  let day='Sunday Mar 22',start='',end='';
+  for(const d of dayOpts){if(dateStr.startsWith(d)){day=d;break;}}
+  const timePart=(dateStr.split('·')[1]||'').trim();
+  if(timePart.includes('–')){[start,end]=timePart.split('–').map(t=>t.trim());}
+  else if(timePart){start=timePart;}
+  document.getElementById('eem-day').value=day;
+  document.getElementById('eem-start').value=start;
+  document.getElementById('eem-end').value=end;
+  document.getElementById('eem-loc').value=ev.location||'';
+  document.getElementById('eem-desc').value=ev.description||'';
+  document.getElementById('eem-part').value=ev.participants||'';
+  document.getElementById('eem-assigned').value=(ev.assignedTo||[]).join(', ');
+  document.getElementById('del-event-btn').style.display=ev._custom?'inline-flex':'none';
+  document.getElementById('edit-event-modal').classList.add('open');
+}
+async function saveEvent(){
+  const day=document.getElementById('eem-day').value||'';
+  const s=document.getElementById('eem-start').value||'';
+  const e2=document.getElementById('eem-end').value||'';
+  const time=s&&e2?` · ${s}–${e2}`:s?` · ${s}`:'';
+  const assignedRaw=document.getElementById('eem-assigned').value;
+  const assignedTo=assignedRaw?assignedRaw.split(',').map(x=>x.trim()).filter(Boolean):[];
+  const obj={title:document.getElementById('eem-ttl').value,type:document.getElementById('eem-type').value,cat:document.getElementById('eem-cat').value,date:day+time,location:document.getElementById('eem-loc').value,description:document.getElementById('eem-desc').value,participants:document.getElementById('eem-part').value,assignedTo};
+  const isCustom=editingEventId&&(events||[]).find(e=>e.id===editingEventId&&e._custom);
+  const isDefault=editingEventId&&DEFAULT_EVENTS.some(e=>e.id===editingEventId)&&!isCustom;
+  if(isCustom){
+    await sb.from('custom_events').update(obj).eq('id',editingEventId);
+    const idx=(events||[]).findIndex(e=>e.id===editingEventId);
+    if(idx>=0)events[idx]={...events[idx],...obj};
+  } else if(isDefault){
+    const{data}=await sb.from('custom_events').insert({...obj,_override_id:editingEventId}).select().single();
+    if(data){const newEv={...data,_custom:true,assignedTo};const idx=(events||[]).findIndex(e=>e.id===editingEventId);if(idx>=0)events[idx]=newEv;else events.push(newEv);}
+  } else {
+    const{data}=await sb.from('custom_events').insert(obj).select().single();
+    if(data)events.push({...data,_custom:true,assignedTo});
+  }
+  await loadCustomEvents();closeMo('edit-event-modal');toast('Événement enregistré ✓');
+}
+async function deleteEvent(){
+  if(!editingEventId||!confirm('Supprimer cet événement ?'))return;
+  await sb.from('custom_events').delete().eq('id',editingEventId);
+  events=(events||[]).filter(e=>e.id!==editingEventId);
+  await loadCustomEvents();closeMo('edit-event-modal');toast('Événement supprimé');
+}
+
+/* ── CALENDAR WITH DRAG & DROP ── */
+function buildPreConferenceCalendar(){
+  const wrap=document.getElementById('pre-conf-cal');if(!wrap)return;
+  const PRE_DAYS=[
+    {k:'22/03',l:'Sun 22 Mar',v:'Sunday Mar 22'},
+    {k:'23/03',l:'Mon 23 Mar',v:'Monday Mar 23'},
+    {k:'24/03',l:'Tue 24 Mar',v:'Tuesday Mar 24'},
+    {k:'25/03',l:'Wed 25 Mar',v:'Wednesday Mar 25'},
+    {k:'26/03',l:'Thu 26 Mar',v:'Thursday Mar 26'}
+  ];
+  function dayKey(ev){
+    const d=ev.date||'';
+    if(d.includes('Mar 22')||d.includes('22/03'))return '22/03';
+    if(d.includes('Mar 23')||d.includes('23/03'))return '23/03';
+    if(d.includes('Mar 24')||d.includes('24/03'))return '24/03';
+    if(d.includes('Mar 25')||d.includes('25/03'))return '25/03';
+    if(d.includes('Mar 26')||d.includes('26/03'))return '26/03';
+    return null;
+  }
+  // Merge defaults + custom overrides
+  const calEvs=[...DEFAULT_EVENTS];
+  (events||[]).filter(e=>e._custom).forEach(ce=>{
+    const idx=calEvs.findIndex(d=>d.id===ce.id||(ce._override_id&&d.id===ce._override_id));
+    if(idx>=0)calEvs[idx]={...calEvs[idx],...ce}; else calEvs.push(ce);
+  });
+  const canEdit=isKU();
+  const userEmail=CU?.email||'';
+  let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="font-size:13px;font-weight:700;letter-spacing:-.3px">📆 Pre-Conference Calendar · Vancouver</div>
+    ${canEdit?`<button class="btn btn-ac btn-sm" onclick="openAddEvent()">+ Ajouter</button>`:''}
+  </div><div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:6px">`;
+  PRE_DAYS.forEach(day=>{
+    const dayEvts=calEvs.filter(e=>dayKey(e)===day.k);
+    dayEvts.sort((a,b)=>((a.date.split('·')[1]||'').trim().split('–')[0]||'00:00').localeCompare((b.date.split('·')[1]||'').trim().split('–')[0]||'00:00'));
+    const meetEvts=dayEvts.filter(e=>(e.cat||'team')==='meeting');
+    const teamEvts=dayEvts.filter(e=>(e.cat||'team')==='team');
+    html+=`<div style="min-width:175px;flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;transition:background .15s,border-color .15s" ondragover="calDragOver(event,this)" ondragleave="calDragLeave(this)" ondrop="calDrop(event,this,'${day.v}')">
+      <div style="padding:8px 10px;background:var(--s3);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--t2)">${day.l}</span>
+        ${canEdit?`<button onclick="openAddEventOnDay('${day.v}')" style="background:none;border:none;color:var(--t4);cursor:pointer;font-size:18px;padding:0 2px;line-height:1">+</button>`:''}
+      </div>
+      <div style="padding:5px;display:flex;flex-direction:column;gap:3px">`;
+    [...meetEvts,...teamEvts].forEach(e=>{
+      const isMeet=(e.cat||'team')==='meeting';
+      const col=isMeet?'#6366f1':'#14b8a6';
+      const rgb=isMeet?'99,102,241':'20,184,166';
+      const bgOp=isMeet?(e.assignedTo&&e.assignedTo.includes(userEmail)?'.18':'.07'):'.07';
+      const time=(e.date.split('·')[1]||'').trim();
+      const isAssigned=e.assignedTo&&e.assignedTo.includes(userEmail);
+      html+=`<div draggable="${canEdit}" data-evid="${e.id}" ondragstart="calDragStart(event,'${e.id}')"
+        style="padding:5px 7px;border-radius:6px;background:rgba(${rgb},${bgOp});border-left:2px solid ${col};cursor:${canEdit?'grab':'pointer'};user-select:none;transition:opacity .15s">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:${isMeet?'#818cf8':'#2dd4bf'};line-height:1.3">${e.title.length>34?e.title.slice(0,32)+'…':e.title}</div>
+            ${time?`<div style="font-size:9px;color:var(--t3);margin-top:1px">${time}</div>`:''}
+            ${isAssigned?`<div style="font-size:8px;color:${col};margin-top:2px">✓ Vous</div>`:''}
+          </div>
+          ${canEdit?`<button onclick="openEditEvent('${e.id}')" style="background:none;border:none;color:var(--t4);cursor:pointer;font-size:11px;padding:0;flex-shrink:0;line-height:1" title="Modifier">✏</button>`:''}
+        </div>
+      </div>`;
+    });
+    if(!dayEvts.length)html+=`<div style="font-size:10px;color:var(--t4);padding:6px 4px;font-style:italic;text-align:center">Aucun événement</div>`;
+    html+=`</div></div>`;
+  });
+  html+=`</div><div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#6366f1;opacity:.8"></div>Meetings</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#14b8a6;opacity:.8"></div>Team Events</div>
+    ${canEdit?`<div style="font-size:10px;color:var(--t3);margin-left:auto">⤵ Glisser pour repositionner</div>`:''}
+  </div>`;
+  wrap.innerHTML=html;
+}
+let calDragId=null;
+function calDragStart(e,evid){
+  calDragId=evid;e.dataTransfer.effectAllowed='move';
+  e.currentTarget.style.opacity='.4';
+}
+function calDragOver(e,col){
+  e.preventDefault();e.dataTransfer.dropEffect='move';
+  col.style.background='rgba(99,102,241,.1)';col.style.borderColor='rgba(99,102,241,.5)';
+}
+function calDragLeave(col){col.style.background='';col.style.borderColor='';}
+async function calDrop(e,col,dayV){
+  e.preventDefault();col.style.background='';col.style.borderColor='';
+  if(!calDragId)return;
+  const evid=calDragId;calDragId=null;
+  document.querySelectorAll('[data-evid]').forEach(p=>p.style.opacity='');
+  const allEvs=[...DEFAULT_EVENTS,...(events||[]).filter(ev=>ev._custom)];
+  const ev=allEvs.find(ev=>ev.id===evid);if(!ev)return;
+  const timePart=ev.date.includes('·')?ev.date.split('·').slice(1).join('·'):'';
+  const newDate=dayV+(timePart?' ·'+timePart:'');
+  if(newDate===ev.date){toast('Déjà sur ce jour');return;}
+  const isCustom=(events||[]).find(ev2=>ev2.id===evid&&ev2._custom);
+  if(isCustom){
+    await sb.from('custom_events').update({date:newDate}).eq('id',evid);
+    const idx=(events||[]).findIndex(ev2=>ev2.id===evid);
+    if(idx>=0)events[idx].date=newDate;
+  } else {
+    const payload={...ev,date:newDate,_override_id:evid};
+    delete payload.id;
+    const{data}=await sb.from('custom_events').insert(payload).select().single();
+    if(data){const newEv={...data,_custom:true,assignedTo:ev.assignedTo||[]};events=events||[];const idx=events.findIndex(ev2=>ev2.id===evid);if(idx>=0)events[idx]=newEv;else events.push(newEv);}
+  }
+  toast('✓ Déplacé vers '+dayV.split(' ').slice(0,2).join(' '));
+  buildPreConferenceCalendar();renderEvGrid();
+}
+
+/* ── BULK USER CREATION ── */
+let bulkPwdVisible=false;
+function toggleBulkPwdVisibility(){
+  const inp=document.getElementById('bulk-password');
+  bulkPwdVisible=!bulkPwdVisible;
+  inp.type=bulkPwdVisible?'text':'password';
+  document.getElementById('bulk-pwd-toggle').textContent=bulkPwdVisible?'🙈 Masquer':'👁 Afficher';
+}
+function generateBulkPassword(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$';
+  let pwd='';for(let i=0;i<12;i++)pwd+=chars[Math.floor(Math.random()*chars.length)];
+  const inp=document.getElementById('bulk-password');
+  inp.value=pwd;inp.type='text';bulkPwdVisible=true;
+  document.getElementById('bulk-pwd-toggle').textContent='🙈 Masquer';
+  toast('Mot de passe généré ✓');
+}
+async function testServiceKey(){
+  const svcKey=(document.getElementById('bulk-service-key')?.value||'').trim();
+  const status=document.getElementById('svc-key-status');
+  if(!svcKey){status.textContent='⚠️ Entrez une clé d\'abord';status.style.color='var(--am)';return;}
+  status.textContent='Test en cours…';status.style.color='var(--t3)';
+  try{
+    const res=await fetch(`${SB_URL}/auth/v1/admin/users?page=1&per_page=1`,{
+      headers:{'apikey':svcKey,'Authorization':'Bearer '+svcKey}
+    });
+    if(res.ok){
+      const data=await res.json();
+      status.textContent=`✅ Clé valide — ${data.total||'?'} utilisateurs dans Supabase`;
+      status.style.color='var(--gr)';
+    } else {
+      const err=await res.json();
+      status.textContent=`❌ Clé invalide: ${err.message||res.status}`;
+      status.style.color='var(--re)';
+    }
+  }catch(e){
+    status.textContent=`❌ Erreur: ${e.message}`;
+    status.style.color='var(--re)';
+  }
+}
+async function bulkCreateTeamAccounts(){
+  const tempPass=(document.getElementById('bulk-password')?.value||'').trim();
+  const svcKey=(document.getElementById('bulk-service-key')?.value||'').trim();
+  if(!tempPass||tempPass.length<8){toast('⚠️ Mot de passe trop court (min 8
