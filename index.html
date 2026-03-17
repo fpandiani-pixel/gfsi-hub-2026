@@ -273,7 +273,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="ls">
   <div class="lc">
     <div class="ll"><div class="lm">GF</div><div><div class="lt">GFSI Hub 2026</div><div class="ls2">Vancouver · March 22–26</div></div></div>
@@ -283,13 +282,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
     <input class="fi" id="le" type="email" placeholder="you [at] theconsumergoodsforum.com">
     <label class="fl">Password</label>
     <input class="fi" id="lp" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" style="margin-bottom:0">
-    <button class="bs" onclick="doLogin()" style="margin-top:12px">Sign in →</button>
+    <button class="bs" onclick="window.doLogin()" style="margin-top:12px">Sign in →</button>
     <div class="le" id="lerr"></div>
     <div class="lhint">Admin: f.pandiani [at] theconsumergoodsforum.com</div>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <div class="sidebar">
     <div class="sbh"><div class="sblogo"><div class="sbmark">GF</div><div><div class="sbtxt">GFSI Hub</div><div class="sbsub">Vancouver 2026</div></div></div></div>
@@ -309,12 +307,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       <div class="ngl" id="adm-ngl" style="display:none">Admin</div>
       <div class="ni" id="adm-ni" style="display:none" onclick="goTo('admin',this)"><span class="ni-icon">⚙</span>Console</div>
     </nav>
-    <div class="sbf"><button class="bso" onclick="doLogout()">Sign out</button></div>
+    <div class="sbf"><button class="bso" onclick="window.doLogout()">Sign out</button></div>
   </div>
 
   <div class="main">
 
-    <!-- MY AGENDA -->
     <div class="page active" id="page-agenda">
       <div class="topbar">
         <div><div class="tb-title">My Agenda</div><div class="tb-sub">Conference sessions · join to build your personal schedule</div></div>
@@ -338,7 +335,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- FULL WEEK VIEW -->
     <div class="page" id="page-week">
       <div class="topbar"><div><div class="tb-title">Full Week View</div><div class="tb-sub">All days · all sessions · complete overview</div></div></div>
       <div class="content">
@@ -347,7 +343,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- TEAM CALENDAR -->
     <div class="page" id="page-team">
       <div class="topbar"><div><div class="tb-title">Team Calendar</div><div class="tb-sub">Shared schedule · who is attending what</div></div></div>
       <div class="content">
@@ -357,7 +352,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- MEETING ROOMS -->
     <div class="page" id="page-meetings">
       <div class="topbar">
         <div><div class="tb-title">Meeting Rooms</div><div class="tb-sub">Pre-conference & side meetings · all days</div></div>
@@ -369,7 +363,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- ATTENDEES -->
     <div class="page" id="page-attendees">
       <div class="topbar"><div><div class="tb-title">Attendees</div><div class="tb-sub">32 participants · SteerCo members & GFSI team</div></div><div id="att-add-btn"></div></div>
       <div class="content">
@@ -378,7 +371,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- SOCIAL EVENTS -->
     <div class="page" id="page-events">
       <div class="topbar">
         <div><div class="tb-title">Events &amp; Meetings</div><div class="tb-sub">Calendrier · événements sociaux · réunions internes</div></div>
@@ -395,7 +387,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- FEEDBACK FORM -->
     <div class="page" id="page-feedback">
       <div class="topbar"><div><div class="tb-title">Submit Feedback</div><div class="tb-sub">Detailed responses go directly to the organiser</div></div></div>
       <div class="content">
@@ -424,7 +415,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
     </div>
 
-    <!-- FEEDBACK DASHBOARD -->
     <div class="page" id="page-feedbackdash">
       <div class="topbar">
         <div><div class="tb-title">Feedback Dashboard</div><div class="tb-sub">Consolidated comments & ratings from all team members</div></div>
@@ -438,7 +428,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
     </div>
 
 
-    <!-- BOOTH GFSI -->
     <div class="page" id="page-booth">
       <div class="topbar">
         <div><div class="tb-title">&#127979; GFSI Booth</div><div class="tb-sub">Planning des présences au stand · Vancouver Convention Centre</div></div>
@@ -448,25 +437,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
       <div class="content">
 
-        <!-- Legend + stats -->
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px" id="booth-stats"></div>
 
-        <!-- Day tabs -->
         <div class="dtabs" id="booth-day-tabs" style="margin-bottom:16px"></div>
 
-        <!-- Grid: time slots x team members -->
         <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;overflow:hidden;overflow-x:auto">
           <div id="booth-grid"></div>
         </div>
 
-        <!-- My slots summary -->
         <div id="booth-my-slots" style="margin-top:20px"></div>
 
       </div>
     </div>
 
 
-    <!-- ADMIN CONSOLE -->
     <div class="page" id="page-admin">
       <div class="topbar"><div><div class="tb-title">Admin Console</div><div class="tb-sub">Users · access management · data overview</div></div></div>
       <div class="content">
@@ -543,10 +527,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
   </div>
 </div>
 
-<!-- SESSION MODAL -->
 <div class="mo" id="sess-modal"><div class="md"><button class="mdx" onclick="closeMo('sess-modal')">✕</button><div id="sess-modal-content"></div></div></div>
 
-<!-- EDIT EVENT MODAL -->
 <div class="mo" id="edit-event-modal"><div class="md" style="width:620px"><button class="mdx" onclick="closeMo('edit-event-modal')">&#10005;</button>
   <div class="md-title" id="eem-title">Modifier l'&eacute;v&eacute;nement</div>
   <div id="eem-default-warn" style="display:none;margin:10px 0;padding:9px 12px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:7px;font-size:11px;color:#fbbf24">
@@ -594,7 +576,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
   </div>
 </div></div>
 
-<!-- EDIT MEETING MODAL -->
 <div class="mo" id="edit-meeting-modal"><div class="md" style="width:580px"><button class="mdx" onclick="closeMo('edit-meeting-modal')">✕</button>
   <div class="md-title" id="emm-title">Edit Meeting</div>
   <div style="margin-top:16px">
@@ -617,11 +598,26 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
 
 <script>
 
+// Ensure all essential variables are declared before they are used
+let sb,CU,CP,starVal=0;
+let customAttendees=[];
+let editingMeetingId=null,editingEventId=null;
+let currentDay='day1',teamDay='day1',agView='cards';
+let fbFilter='all';
+let customSessions=[];
+let editingSessionId=null;
+let editingAttIdx=null;
+let boothDay='day1';
+let boothPresences={}; 
+let boothCustomSlots={}; 
+let mFilter='All';
+let evCatFilter='team'; 
+let myReg=new Set();
+
 const ADMIN='f.pandiani'+'@'+'theconsumergoodsforum.com';
 const KU_ROLES=['admin','keyuser'];
 const SB_URL='https://ifsarzscikczpboqgbbm.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlmc2FyenNjaWtjenBib3FnYmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MDczOTgsImV4cCI6MjA4ODk4MzM5OH0.YdSc8Po-8IYqNwuyBXzcEpzHTgtf3_IbmkpRJWk0Clo';
-let sb,CU,CP,starVal=0;
 
 const MCOL={'plenary':'#6366f1','breakout':'#f97316','techtalk':'#f59e0b','workshop':'#22c55e','event':'#ec4899','break':'rgba(255,255,255,.06)'};
 const MCOLAV=['#6366f1','#14b8a6','#f97316','#ec4899','#22c55e','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#84cc16'];
@@ -768,8 +764,6 @@ const ATTENDEES=[
 
 let meetings=[...DEFAULT_MEETINGS];
 let events=[...DEFAULT_EVENTS];
-let editingMeetingId=null,editingEventId=null;
-let currentDay='day1',teamDay='day1',agView='cards';
 
 function t2m(t){const[h,m]=t.split(':').map(Number);return h*60+(m||0);}
 function isKU(){return CP&&(KU_ROLES.includes(CP.role)||CU?.email===ADMIN);}
@@ -777,37 +771,81 @@ function ini(n){return(n||'?').split(' ').map(w=>w[0]).join('').toUpperCase().sl
 
 /* ── AUTH ── */
 window.addEventListener('DOMContentLoaded',()=>{
+  console.log("DOM loaded, initializing Supabase...");
   sb=window.supabase.createClient(SB_URL,SB_KEY);
-  sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});
+  sb.auth.getSession().then(({data:{session}})=>{if(session)window.onSignedIn(session.user);});
   sb.auth.onAuthStateChange((ev,session)=>{
-    if(ev==='SIGNED_IN'&&session&&!CU)onSignedIn(session.user);
+    if(ev==='SIGNED_IN'&&session&&!CU)window.onSignedIn(session.user);
     if(ev==='SIGNED_OUT'){CU=null;document.getElementById('ls').style.display='flex';document.getElementById('app').style.display='none';}
   });
 });
-async function doLogin(){
-  const email=document.getElementById('le').value.trim(),pass=document.getElementById('lp').value;
-  const err=document.getElementById('lerr');err.textContent='';
-  if(!email||!pass){err.textContent='Both fields required.';return;}
-  err.textContent='Signing in…';
-  const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
-  if(error)err.textContent='Error: '+error.message;
-  else if(data?.user){err.textContent='';onSignedIn(data.user);}
-}
-async function onSignedIn(user){
-  if(CU)return; CU=user;
-  const{data}=await sb.from('profiles').select('*').eq('id',user.id).single();
-  CP=data||{name:user.email.split('@')[0],role:'member'};
-  document.getElementById('ls').style.display='none';
-  document.getElementById('app').style.display='block';
-  document.getElementById('sbav').textContent=ini(CP.name||user.email);
-  document.getElementById('sbun').textContent=CP.name||user.email;
-  document.getElementById('sbrl').textContent=CP.role==='admin'?'Administrator':CP.role==='keyuser'?'Key User':'Member';
-  if(isKU()){document.getElementById('adm-ngl').style.display='block';document.getElementById('adm-ni').style.display='flex';}
-  // Load custom data from DB
-  loadCustomMeetings();loadCustomEvents();loadCustomSessions();
-  buildAgenda();buildFeedbackSelect();buildAttendees();buildEvents();
-}
-async function doLogout(){await sb.auth.signOut();}
+
+window.doLogin = async function() {
+  try {
+    const email=document.getElementById('le').value.trim(), pass=document.getElementById('lp').value;
+    const err=document.getElementById('lerr');
+    err.textContent='';
+    
+    if(!email||!pass){err.textContent='Both fields required.';return;}
+    
+    err.textContent='Signing in…';
+    const {data, error} = await sb.auth.signInWithPassword({email,password:pass});
+    
+    if(error) {
+      err.textContent='Error: '+error.message;
+    } else if(data?.user) {
+      err.textContent='Success! Loading...'; 
+      await window.onSignedIn(data.user);
+    }
+  } catch (e) {
+    document.getElementById('lerr').textContent='Crash during login. Check Console.';
+    console.error("Login Crash:", e);
+  }
+};
+
+window.onSignedIn = async function(user) {
+  try {
+    if(CU)return; CU=user;
+    
+    const {data, error: profileErr} = await sb.from('profiles').select('*').eq('id',user.id).single();
+    if (profileErr) console.warn("Profile fetch warning:", profileErr.message);
+    
+    const fallbackName = (user.email || 'user@domain').split('@')[0];
+    CP = data || {name: fallbackName, role: 'member'};
+    
+    // Hide Login Screen FIRST
+    document.getElementById('ls').style.display='none';
+    document.getElementById('app').style.display='block';
+    
+    // Populate Sidebar
+    document.getElementById('sbav').textContent=ini(CP.name||user.email||'??');
+    document.getElementById('sbun').textContent=CP.name||user.email||'Unknown';
+    document.getElementById('sbrl').textContent=CP.role==='admin'?'Administrator':CP.role==='keyuser'?'Key User':'Member';
+    
+    if(isKU()){
+      document.getElementById('adm-ngl').style.display='block';
+      document.getElementById('adm-ni').style.display='flex';
+    }
+    
+    // Load Data Safely
+    await loadCustomMeetings();
+    await loadCustomEvents();
+    await loadCustomSessions();
+    
+    buildAgenda();
+    buildFeedbackSelect();
+    buildAttendees();
+    buildEvents();
+    
+  } catch (e) {
+    console.error("Error building the dashboard UI:", e);
+    alert("An error occurred while loading parts of the dashboard. Check the console.");
+  }
+};
+
+window.doLogout = async function() {
+  await sb.auth.signOut();
+};
 
 /* ── MEETINGS ── */
 async function loadCustomMeetings(){
@@ -823,7 +861,6 @@ async function loadCustomEvents(){
   buildEvents();
 }
 
-let mFilter='All';
 function buildMeetings(){
   // Show add button for key users
   const ab=document.getElementById('add-meeting-btn');
@@ -901,7 +938,6 @@ async function deleteMeeting(){
 }
 
 /* ── EVENTS ── */
-let evCatFilter='team'; // Default: show only team events in cards, meetings are in calendar
 async function buildEvents(){
   const ab=document.getElementById('add-event-btn');
   if(isKU())ab.innerHTML='<button class="btn btn-ac btn-sm" onclick="openAddEvent()">+ Ajouter</button>';
@@ -1305,7 +1341,6 @@ function buildBulkPreview(){
 }
 
 /* ── ATTENDEES ── */
-let attFilter='All';
 function buildAttendees(){
   const ab=document.getElementById('att-add-btn');
   if(ab&&isKU())ab.innerHTML='<button class="btn btn-ac btn-sm" onclick="openAddAttendee()">+ Participant</button>';
@@ -1328,7 +1363,6 @@ function renderAttendees(){
 }
 
 /* ── AGENDA ── */
-let myReg=new Set();
 async function buildAgenda(){
   const{data}=await sb.from('registrations').select('session_id').eq('user_id',CU.id);
   if(data)data.forEach(r=>myReg.add(r.session_id));
@@ -1540,7 +1574,6 @@ async function buildWeekView(){
 }
 
 /* ── FEEDBACK ── */
-let fbFilter='all';
 function buildFeedbackSelect(){
   const sel=document.getElementById('fb-sess');
   SESSIONS.filter(s=>s.type!=='break').forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent='['+(s.day==='day1'?'D1':s.day==='day2'?'D2':'D3')+' '+s.start+'] '+s.title.slice(0,50)+(s.title.length>50?'…':'');sel.appendChild(o);});
@@ -1681,9 +1714,6 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 
 
 /* ── SESSION EDITING ── */
-let customSessions=[];
-let editingSessionId=null;
-
 async function loadCustomSessions(){
   const{data}=await sb.from('custom_sessions').select('*');
   customSessions=data||[];
@@ -1766,9 +1796,6 @@ async function deleteSession(){
 }
 
 /* ── ATTENDEE EDITING ── */
-let customAttendees=[...ATTENDEES];
-let editingAttIdx=null;
-
 function openAddAttendee(){
   editingAttIdx=null;
   document.getElementById('eam-title').textContent='Ajouter un participant';
@@ -1840,10 +1867,6 @@ const BOOTH_SLOTS_BY_DAY={
 };
 // Flat list for compatibility
 const BOOTH_SLOTS=Object.values(BOOTH_SLOTS_BY_DAY).flat();
-
-let boothDay='day1';
-let boothPresences={}; // key: `${day}-${slotId}-${userEmail}` → true/false
-let boothCustomSlots={}; // custom slots per day
 
 async function loadBoothData(){
   const{data}=await sb.from('booth_presences').select('*');
@@ -2026,7 +2049,6 @@ function openAddBoothSlot(){
 
 </script>
 
-<!-- EDIT SESSION MODAL -->
 <div class="mo" id="edit-sess-modal"><div class="md" style="width:620px"><button class="mdx" onclick="closeMo('edit-sess-modal')">✕</button>
   <div class="md-title" id="esm-title">Modifier la session</div>
   <div id="esm-default-warn" style="display:none;margin:10px 0;padding:9px 12px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:7px;font-size:11px;color:#fbbf24">
@@ -2067,7 +2089,6 @@ function openAddBoothSlot(){
   </div>
 </div></div>
 
-<!-- EDIT ATTENDEE MODAL -->
 <div class="mo" id="edit-att-modal"><div class="md" style="width:480px"><button class="mdx" onclick="closeMo('edit-att-modal')">✕</button>
   <div class="md-title" id="eam-title">Modifier le participant</div>
   <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
