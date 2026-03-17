@@ -598,7 +598,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
 <div class="toast" id="toast"></div>
 
 <script>
-// Ensure all essential variables are declared before they are used
+// Declare global variables
 let sb = null;
 let CU = null;
 let CP = null;
@@ -852,17 +852,18 @@ window.onSignedIn = async function(user) {
     if (CU) return;
     CU = user;
     
+    // 1. Load Profile
     const { data, error: profileErr } = await sb.from('profiles').select('*').eq('id', user.id).single();
-    if (profileErr) {
-      console.warn("Profile fetch warning:", profileErr.message);
-    }
+    if (profileErr) console.warn("Profile fetch warning:", profileErr.message);
     
     const fallbackName = (user.email || 'user@domain').split('@')[0];
     CP = data || { name: fallbackName, role: 'member' };
     
+    // 2. Hide Login Screen FIRST
     document.getElementById('ls').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     
+    // 3. Populate Sidebar
     document.getElementById('sbav').textContent = ini(CP.name || user.email || '??');
     document.getElementById('sbun').textContent = CP.name || user.email || 'Unknown';
     document.getElementById('sbrl').textContent = CP.role === 'admin' ? 'Administrator' : CP.role === 'keyuser' ? 'Key User' : 'Member';
@@ -872,19 +873,26 @@ window.onSignedIn = async function(user) {
       document.getElementById('adm-ni').style.display = 'flex';
     }
     
-    await loadCustomMeetings();
-    await loadCustomEvents();
-    await loadCustomSessions();
-    await loadBoothData();
+    // 4. Safe Module Loading
+    const safeLoad = async (name, func) => {
+      try { await func(); } 
+      catch(e) { console.error(`❌ CRASH IN MODULE: ${name}`, e); }
+    };
+
+    // Load data silently in the background
+    await safeLoad('Custom Meetings', loadCustomMeetings);
+    await safeLoad('Custom Events', loadCustomEvents);
+    await safeLoad('Custom Sessions', loadCustomSessions);
+    await safeLoad('Booth Data', loadBoothData);
     
-    buildAgenda();
-    buildFeedbackSelect();
-    buildAttendees();
-    buildEvents();
-    
+    // Build UI components
+    safeLoad('Agenda UI', buildAgenda);
+    safeLoad('Feedback UI', buildFeedbackSelect);
+    safeLoad('Attendees UI', buildAttendees);
+
   } catch (e) {
-    console.error("Error building the dashboard UI:", e);
-    alert("An error occurred while loading parts of the dashboard. Check the console.");
+    console.error("Critical login error:", e);
+    alert("A critical error occurred. Please check the console.");
   }
 };
 
